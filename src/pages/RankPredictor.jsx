@@ -1,0 +1,378 @@
+import { useState, useEffect } from 'react'
+import { apiFetch } from '../utils/api'
+import './RankPredictor.css'
+
+const SUBJECTS = [
+  { key: 'physics',   label: 'Physics',   total: 180, defaultVal: 140, color: '#60a5fa' },
+  { key: 'chemistry', label: 'Chemistry', total: 180, defaultVal: 155, color: '#f8bd2a' },
+  { key: 'biology',   label: 'Biology',   total: 360, defaultVal: 310, color: '#4ade80' },
+]
+
+// College mock data removed; we now use real data from the PostgreSQL predictions table.
+
+const tierColor = { S: '#d32f2f', A: '#f8bd2a', B: '#4ade80' }
+
+// Estimate rank from score (simplified model)
+function predictRank(score) {
+  if (score >= 700) return Math.round(1 + (720 - score) * 3)
+  if (score >= 650) return Math.round(50 + (700 - score) * 30)
+  if (score >= 600) return Math.round(1550 + (650 - score) * 60)
+  if (score >= 550) return Math.round(4550 + (600 - score) * 120)
+  if (score >= 500) return Math.round(10550 + (550 - score) * 250)
+  return Math.round(23050 + (500 - score) * 500)
+}
+
+// Graph data: score vs rank at breakpoints
+const GRAPH_POINTS = [
+  { score: 400, rank: 80000 },
+  { score: 450, rank: 55000 },
+  { score: 500, rank: 35000 },
+  { score: 550, rank: 18000 },
+  { score: 600, rank: 8000  },
+  { score: 620, rank: 5200  },
+  { score: 640, rank: 3000  },
+  { score: 660, rank: 1600  },
+  { score: 680, rank: 650   },
+  { score: 700, rank: 180   },
+  { score: 715, rank: 50    },
+  { score: 720, rank: 1     },
+]
+
+// SVG dimensions
+const W = 420, H = 180, PX = 40, PY = 20
+
+function scaleX(score) {
+  return PX + ((score - 400) / (720 - 400)) * (W - PX - 20)
+}
+function scaleY(rank) {
+  const logRank = Math.log10(Math.max(rank, 1))
+  const logMax = Math.log10(80000)
+  return PY + (logRank / logMax) * (H - PY - 20)
+}
+
+function buildPath(pts) {
+  return pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${scaleX(p.score).toFixed(1)},${scaleY(p.rank).toFixed(1)}`).join(' ')
+}
+
+export default function RankPredictor() {
+  const [scores, setScores] = useState({
+    physics: 140,
+    chemistry: 155,
+    biology: 310,
+    total: ''
+  })
+  const [category, setCategory] = useState('General')
+  const [state, setState] = useState('All India')
+  const [predicted, setPredicted] = useState(false)
+  const [aiiquo, setAiiquo] = useState(true)
+  const [apiResult, setApiResult] = useState(null)
+  const [apiLoading, setApiLoading] = useState(false)
+
+  const calculatedTotal = scores.physics + scores.chemistry + scores.biology
+  const totalScore = scores.total !== '' ? Number(scores.total) : calculatedTotal
+  const predictedRank = apiResult?.estimatedRank || predictRank(totalScore)
+  const topPct = Math.max(0.01, (predictedRank / 1000000) * 100).toFixed(1)
+
+  const handlePredict = async e => {
+    e.preventDefault()
+    setPredicted(true)
+    setApiLoading(true)
+    try {
+      const result = await apiFetch('/predict/rank', {
+        method: 'POST',
+        body: JSON.stringify({ score: totalScore, category })
+      })
+      setApiResult(result)
+    } catch (err) {
+      console.warn('Prediction API unavailable, using local estimate')
+    } finally {
+      setApiLoading(false)
+    }
+  }
+
+  const updateScore = (key, val) => {
+    const subj = SUBJECTS.find(s => s.key === key)
+    const clamped = Math.max(0, Math.min(subj.total, Number(val) || 0))
+    setScores(prev => ({ ...prev, [key]: clamped }))
+  }
+
+  const matchingColleges = apiResult?.eligibleColleges || []
+
+  // Probability based on dynamically predicted rank
+  const getProbability = (college) => {
+    // If the student's rank is much lower (better) than the college's cutoff (aiRank), high chance
+    const cutoff = college.maxRank;
+    if (!cutoff || !predictedRank) return 50;
+    
+    // Roughly if student is 5% better than cutoff, it's 99%
+    const diff = cutoff - predictedRank;
+    if (diff > cutoff * 0.1) return 98;
+    if (diff > 0) return 85;
+    if (diff > -500) return 60;
+    return 20; // Unlikely but possible
+  }
+
+  // Graph marker X,Y for current score
+  const markerX = scaleX(Math.min(720, Math.max(400, totalScore)))
+  const markerY = scaleY(Math.max(1, predictedRank))
+
+  return (
+    <div className="page-container">
+      <div className="page-header animate-in">
+        <div>
+          <p className="section-label">Analytics</p>
+          <h1 className="page-title">NEET Rank Predictor</h1>
+          <p className="page-subtitle">Precision-engineered engine to forecast your medical future based on 2023-24 counseling data.</p>
+        </div>
+      </div>
+
+      <div className="predictor-grid">
+        {/* Input Panel */}
+        <div className="predictor-left">
+          <form onSubmit={handlePredict} className="card animate-in">
+            <h2 className="card-heading">Enter Your Scores</h2>
+            <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', marginBottom: '1.5rem' }}>
+              Based on official 2024 NEET marking scheme
+            </p>
+
+            <div className="score-inputs">
+              {SUBJECTS.map(s => (
+                <div key={s.key} className="field-group">
+                  <label className="field-label" style={{ color: s.color }}>
+                    <span className="material-icons" style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}>science</span>
+                    {' '}{s.label} <span style={{ color: 'var(--on-surface-variant)' }}>/ {s.total}</span>
+                  </label>
+                  <div className="score-input-wrap">
+                    <input
+                      className="field-input"
+                      type="number"
+                      placeholder={`0 – ${s.total}`}
+                      min="0"
+                      max={s.total}
+                      value={scores[s.key]}
+                      onChange={e => updateScore(s.key, e.target.value)}
+                    />
+                    <div className="score-mini-bar">
+                      <div
+                        className="score-mini-fill"
+                        style={{
+                          width: `${(scores[s.key] / s.total) * 100}%`,
+                          background: s.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="field-group" style={{ marginTop: '1rem' }}>
+              <label className="field-label" style={{ color: 'var(--primary)' }}>
+                <span className="material-icons" style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}>functions</span>
+                {' '}Total Score (Optional) <span style={{ color: 'var(--on-surface-variant)' }}>/ 720</span>
+              </label>
+              <div className="score-input-wrap">
+                <input
+                  className="field-input"
+                  type="number"
+                  placeholder={`Auto (${calculatedTotal}) or enter directly`}
+                  min="0"
+                  max="720"
+                  value={scores.total}
+                  onChange={e => setScores(p => ({ ...p, total: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="field-group" style={{ marginTop: '1rem' }}>
+              <label className="field-label">Category</label>
+              <select className="field-select" value={category} onChange={e => setCategory(e.target.value)}>
+                {['General', 'OBC', 'SC', 'ST', 'EWS'].map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+
+            <div className="field-group">
+              <label className="field-label">State Preference</label>
+              <select className="field-select" value={state} onChange={e => setState(e.target.value)}>
+                {['All India', 'Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'UP'].map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+
+            <div className="toggle-row">
+              <span className="field-label" style={{ margin: 0 }}>AIQ Consideration (15%)</span>
+              <label className="toggle">
+                <input type="checkbox" checked={aiiquo} onChange={() => setAiiquo(p => !p)} />
+                <span className="toggle-track"><span className="toggle-thumb" /></span>
+              </label>
+            </div>
+
+            <button type="submit" className="btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: '1.5rem' }}>
+              <span className="material-icons">auto_graph</span>
+              Predict My Rank
+            </button>
+          </form>
+
+          {/* Live Score Summary */}
+          <div className="card score-summary animate-in">
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem' }}>Score Breakdown</h3>
+            {SUBJECTS.map(s => (
+              <div key={s.key} className="score-row">
+                <span className="score-subj">{s.label}</span>
+                <div className="progress-bar" style={{ flex: 1 }}>
+                  <div className="progress-fill" style={{
+                    width: `${(scores[s.key] / s.total) * 100}%`,
+                    background: `linear-gradient(90deg, ${s.color}66, ${s.color})`,
+                    transition: 'width 0.4s ease',
+                  }} />
+                </div>
+                <span className="score-val">{scores[s.key]}/{s.total}</span>
+              </div>
+            ))}
+            <div className="total-row">
+              <span>Total Score</span>
+              <span className="total-val">{totalScore} / 720</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Results Panel */}
+        <div className="predictor-right">
+          {/* Live Rank Graph — always visible */}
+          <div className="card rank-graph-card animate-in">
+            <div className="rank-graph-header">
+              <span className="material-icons" style={{ color: 'var(--primary)' }}>show_chart</span>
+              <span>Score → Rank Curve</span>
+              <span className="badge badge-gold" style={{ marginLeft: 'auto' }}>Live</span>
+            </div>
+
+            <svg viewBox={`0 0 ${W} ${H}`} className="rank-svg">
+              {/* Grid lines */}
+              {[400, 500, 600, 700, 720].map(s => (
+                <line key={s} x1={scaleX(s)} y1={PY} x2={scaleX(s)} y2={H - 20}
+                  stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+              ))}
+              {/* Gradient fill */}
+              <defs>
+                <linearGradient id="graphGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#d32f2f" stopOpacity="0.3" />
+                  <stop offset="100%" stopColor="#d32f2f" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              {/* Area fill */}
+              <path
+                d={`${buildPath(GRAPH_POINTS)} L${scaleX(720)},${H - 20} L${scaleX(400)},${H - 20} Z`}
+                fill="url(#graphGrad)"
+              />
+              {/* Line */}
+              <path d={buildPath(GRAPH_POINTS)} fill="none" stroke="#d32f2f" strokeWidth="2.5" strokeLinecap="round" />
+
+              {/* Current score marker */}
+              <line x1={markerX} y1={PY} x2={markerX} y2={H - 20}
+                stroke="var(--secondary)" strokeWidth="1.5" strokeDasharray="4,3" />
+              <circle cx={markerX} cy={markerY} r="6" fill="var(--secondary)" stroke="#fff" strokeWidth="2" />
+
+              {/* Axis labels */}
+              {[400, 500, 600, 700].map(s => (
+                <text key={s} x={scaleX(s)} y={H - 4} textAnchor="middle"
+                  fontSize="8" fill="rgba(255,255,255,0.4)">{s}</text>
+              ))}
+              <text x={PX - 4} y={PY + 4} textAnchor="end" fontSize="8" fill="rgba(255,255,255,0.4)">Rank</text>
+              <text x={W / 2} y={H - 4} textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.3)">Score →</text>
+            </svg>
+
+            <div className="rank-graph-legend">
+              <div className="rank-graph-score">
+                <span style={{ color: 'var(--on-surface-variant)', fontSize: '0.72rem' }}>Your Score</span>
+                <span className="gradient-text" style={{ fontWeight: 700 }}>{totalScore} / 720</span>
+              </div>
+              <div className="rank-graph-score">
+                <span style={{ color: 'var(--on-surface-variant)', fontSize: '0.72rem' }}>Est. Rank</span>
+                <span style={{ color: 'var(--secondary)', fontWeight: 700 }}>#{predictedRank.toLocaleString()}</span>
+              </div>
+              <div className="rank-graph-score">
+                <span style={{ color: 'var(--on-surface-variant)', fontSize: '0.72rem' }}>Percentile</span>
+                <span style={{ color: '#4ade80', fontWeight: 700 }}>Top {topPct}%</span>
+              </div>
+            </div>
+          </div>
+
+          {predicted ? (
+            <>
+              {/* Rank hero */}
+              <div className="rank-hero card animate-in">
+                <p className="section-label" style={{ marginBottom: '0.5rem' }}>Predicted Rank</p>
+                <div className="rank-number gradient-text">#{predictedRank.toLocaleString()}</div>
+                <div className="rank-meta">
+                  <span className="badge badge-gold">Top {topPct}%</span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)' }}>Based on 2023-24 data</span>
+                </div>
+                <div className="rank-range">
+                  Expected range: <strong>#{Math.max(1, predictedRank - 500).toLocaleString()} – #{(predictedRank + 600).toLocaleString()}</strong>
+                </div>
+              </div>
+
+              {/* Colleges */}
+              <div className="animate-in">
+                <p className="section-label">Recommended Institutions ({matchingColleges.length})</p>
+                <div className="college-list">
+                  {matchingColleges.length === 0 ? (
+                    <div className="empty-state card">
+                      <span className="material-icons empty-icon">sentiment_dissatisfied</span>
+                      <h3>Score too low for current list</h3>
+                      <p>Try improving Physics and Chemistry scores.</p>
+                    </div>
+                  ) : matchingColleges.map(c => {
+                    const prob = getProbability(c)
+                    return (
+                      <div key={c.name} className="college-card card">
+                        <div className="college-top">
+                          <div>
+                            <span className="tier-badge" style={{ background: `var(--surface-container-highest)`, color: 'var(--primary)' }}>
+                              {c.type}
+                            </span>
+                            <div className="college-name">{c.name}</div>
+                            <div className="college-cutoff">
+                              State: {c.state} • Closing Rank: #{c.maxRank?.toLocaleString() || 'N/A'}
+                            </div>
+                          </div>
+                          <div className="match-circle" style={{ '--mc': prob >= 80 ? '#4ade80' : prob >= 50 ? '#f8bd2a' : '#d32f2f' }}>
+                            <span>{prob}%</span>
+                          </div>
+                        </div>
+                        <div className="progress-bar" style={{ marginTop: '0.875rem' }}>
+                          <div className="progress-fill" style={{
+                            width: `${prob}%`,
+                            background: `linear-gradient(90deg, transparent, ${prob >= 80 ? '#4ade80' : prob >= 50 ? '#f8bd2a' : '#d32f2f'})`,
+                            transition: 'width 0.5s ease',
+                          }} />
+                        </div>
+                        <div className="college-foot">Match Probability</div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="cta-card animate-in" style={{ textAlign: 'left' }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: '0.4rem' }}>Confused with Choice Filling?</h3>
+                <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>
+                  Speak with our expert medical counselors to optimize your preference list for maximum success.
+                </p>
+                <button className="btn-primary">
+                  <span className="material-icons">support_agent</span>
+                  Talk to an Expert
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="empty-state card animate-in">
+              <span className="material-icons empty-icon">auto_graph</span>
+              <h3>Enter your scores to predict your NEET rank</h3>
+              <p>We'll analyze 2023-24 counseling data and show you matching colleges.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

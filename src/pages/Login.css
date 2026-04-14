@@ -1,0 +1,19 @@
+.login-container-new {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.bg-kinetic-gradient {
+    background: linear-gradient(135deg, #d32f2f 0%, #ffb3ac 100%);
+}
+.glass-panel {
+    background: rgba(32, 31, 32, 0.7);
+    backdrop-filter: blur(20px);
+}

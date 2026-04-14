@@ -1,0 +1,85 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  phone        String?
+  passwordHash String
+  role         Role          @default(STUDENT)
+  targetYear   Int?
+  branch       String?
+  category     String?
+  domicile     String?
+  isPro        Boolean       @default(false)
+  streak       Int           @default(0)
+  testsTaken   Int           @default(0)
+  avgScore     Float         @default(0)
+  bestRank     Int?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  attempts     TestAttempt[]
+}
+
+model MockTest {
+  id         String        @id @default(uuid())
+  title      String
+  type       String        // Full Syllabus, Chapter, PYQ, Grand Test
+  subjects   String[]
+  questions  Int
+  duration   Int           // minutes
+  difficulty String
+  tag        String?
+  avgScore   Float         @default(0)
+  attempts   Int           @default(0)
+  isActive   Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  results    TestAttempt[]
+}
+
+model TestAttempt {
+  id         String   @id @default(uuid())
+  userId     String
+  testId     String
+  score      Float
+  totalMarks Int
+  timeTaken  Int      // seconds
+  answers    Json
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  test       MockTest @relation(fields: [testId], references: [id], onDelete: Cascade)
+}
+
+model College {
+  id         String   @id @default(uuid())
+  name       String
+  state      String?
+  type       String?   // e.g. "Government", "Private", "AIIMS"
+  tier       String?  
+  allotments CollegeAllotment[]
+
+  @@unique([name, state])
+}
+
+model CollegeAllotment {
+  id         String   @id @default(uuid())
+  collegeId  String
+  round      String?
+  aiRank     Int?
+  stateRank  Int?
+  year       String?
+  category   String?
+  college    College  @relation(fields: [collegeId], references: [id])
+}

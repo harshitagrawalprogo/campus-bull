@@ -1,0 +1,165 @@
+/* === Expert Counselling =============================== */
+.expert-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.expert-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.4rem;
+  padding: 1.25rem;
+}
+
+.expert-stat-val {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.expert-stat-lbl {
+  font-size: 0.72rem;
+  color: var(--on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Layout */
+.expert-layout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.expert-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.expert-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.expert-card:hover { background: var(--surface-high); }
+.expert-selected { border-color: var(--primary-container) !important; background: rgba(211,47,47,0.06) !important; }
+.expert-unavailable { opacity: 0.5; cursor: not-allowed; }
+
+.expert-top { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+
+.expert-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.expert-info { flex: 1; }
+
+.expert-name {
+  font-family: var(--font-display);
+  font-size: 0.975rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+.expert-role { font-size: 0.78rem; color: var(--on-surface-variant); margin-top: 0.15rem; }
+.expert-speciality { font-size: 0.7rem; color: var(--primary); margin-top: 0.3rem; }
+
+.expert-metrics {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.875rem;
+}
+
+.expert-metric {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--on-surface-variant);
+}
+
+.expert-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.expert-price {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--on-surface);
+}
+
+/* Booking column */
+.booking-card { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.time-slot {
+  padding: 0.6rem;
+  background: var(--surface-highest);
+  color: var(--on-surface-variant);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 500;
+  font-family: var(--font-body);
+  transition: all 0.18s;
+}
+
+.time-slot:hover { background: var(--surface-bright); color: var(--on-surface); }
+.slot-active { background: rgba(211,47,47,0.2) !important; color: var(--primary) !important; }
+
+/* Booking summary */
+.booking-summary {
+  background: var(--surface-highest);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.booking-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.825rem;
+  color: var(--on-surface-variant);
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(91,64,61,0.1);
+}
+
+.booking-row:last-child { border-bottom: none; }
+.booking-row span:last-child { color: var(--on-surface); }
+
+/* Success screen */
+.booking-success {
+  max-width: 480px;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+  padding: 3rem 2.5rem;
+}
+
+.success-icon { font-size: 3.5rem; animation: fadeInUp 0.4s ease both; }
+
+@media (max-width: 1024px) {
+  .expert-layout { grid-template-columns: 1fr; }
+  .expert-stats-row { grid-template-columns: repeat(2, 1fr); }
+}
