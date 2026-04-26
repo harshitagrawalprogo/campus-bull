@@ -2,12 +2,6 @@ import { useState, useEffect } from 'react'
 import { apiFetch } from '../utils/api'
 import './RankPredictor.css'
 
-const SUBJECTS = [
-  { key: 'physics',   label: 'Physics',   total: 180, defaultVal: 140, color: '#60a5fa' },
-  { key: 'chemistry', label: 'Chemistry', total: 180, defaultVal: 155, color: '#f8bd2a' },
-  { key: 'biology',   label: 'Biology',   total: 360, defaultVal: 310, color: '#4ade80' },
-]
-
 // College mock data removed; we now use real data from the PostgreSQL predictions table.
 
 const tierColor = { S: '#d32f2f', A: '#f8bd2a', B: '#4ade80' }
@@ -55,12 +49,7 @@ function buildPath(pts) {
 }
 
 export default function RankPredictor() {
-  const [scores, setScores] = useState({
-    physics: 140,
-    chemistry: 155,
-    biology: 310,
-    total: ''
-  })
+  const [totalScoreInput, setTotalScoreInput] = useState(600)
   const [category, setCategory] = useState('General')
   const [state, setState] = useState('All India')
   const [predicted, setPredicted] = useState(false)
@@ -68,8 +57,7 @@ export default function RankPredictor() {
   const [apiResult, setApiResult] = useState(null)
   const [apiLoading, setApiLoading] = useState(false)
 
-  const calculatedTotal = scores.physics + scores.chemistry + scores.biology
-  const totalScore = scores.total !== '' ? Number(scores.total) : calculatedTotal
+  const totalScore = Number(totalScoreInput) || 0
   const predictedRank = apiResult?.estimatedRank || predictRank(totalScore)
   const topPct = Math.max(0.01, (predictedRank / 1000000) * 100).toFixed(1)
 
@@ -88,12 +76,6 @@ export default function RankPredictor() {
     } finally {
       setApiLoading(false)
     }
-  }
-
-  const updateScore = (key, val) => {
-    const subj = SUBJECTS.find(s => s.key === key)
-    const clamped = Math.max(0, Math.min(subj.total, Number(val) || 0))
-    setScores(prev => ({ ...prev, [key]: clamped }))
   }
 
   const matchingColleges = apiResult?.eligibleColleges || []
@@ -135,51 +117,20 @@ export default function RankPredictor() {
               Based on official 2024 NEET marking scheme
             </p>
 
-            <div className="score-inputs">
-              {SUBJECTS.map(s => (
-                <div key={s.key} className="field-group">
-                  <label className="field-label" style={{ color: s.color }}>
-                    <span className="material-icons" style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}>science</span>
-                    {' '}{s.label} <span style={{ color: 'var(--on-surface-variant)' }}>/ {s.total}</span>
-                  </label>
-                  <div className="score-input-wrap">
-                    <input
-                      className="field-input"
-                      type="number"
-                      placeholder={`0 – ${s.total}`}
-                      min="0"
-                      max={s.total}
-                      value={scores[s.key]}
-                      onChange={e => updateScore(s.key, e.target.value)}
-                    />
-                    <div className="score-mini-bar">
-                      <div
-                        className="score-mini-fill"
-                        style={{
-                          width: `${(scores[s.key] / s.total) * 100}%`,
-                          background: s.color,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
             <div className="field-group" style={{ marginTop: '1rem' }}>
               <label className="field-label" style={{ color: 'var(--primary)' }}>
                 <span className="material-icons" style={{ fontSize: '0.9rem', verticalAlign: 'middle' }}>functions</span>
-                {' '}Total Score (Optional) <span style={{ color: 'var(--on-surface-variant)' }}>/ 720</span>
+                {' '}Total Score <span style={{ color: 'var(--on-surface-variant)' }}>/ 720</span>
               </label>
               <div className="score-input-wrap">
                 <input
                   className="field-input"
                   type="number"
-                  placeholder={`Auto (${calculatedTotal}) or enter directly`}
+                  placeholder="Enter total NEET score"
                   min="0"
                   max="720"
-                  value={scores.total}
-                  onChange={e => setScores(p => ({ ...p, total: e.target.value }))}
+                  value={totalScoreInput}
+                  onChange={e => setTotalScoreInput(e.target.value)}
                 />
               </div>
             </div>
@@ -212,27 +163,6 @@ export default function RankPredictor() {
             </button>
           </form>
 
-          {/* Live Score Summary */}
-          <div className="card score-summary animate-in">
-            <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '1rem' }}>Score Breakdown</h3>
-            {SUBJECTS.map(s => (
-              <div key={s.key} className="score-row">
-                <span className="score-subj">{s.label}</span>
-                <div className="progress-bar" style={{ flex: 1 }}>
-                  <div className="progress-fill" style={{
-                    width: `${(scores[s.key] / s.total) * 100}%`,
-                    background: `linear-gradient(90deg, ${s.color}66, ${s.color})`,
-                    transition: 'width 0.4s ease',
-                  }} />
-                </div>
-                <span className="score-val">{scores[s.key]}/{s.total}</span>
-              </div>
-            ))}
-            <div className="total-row">
-              <span>Total Score</span>
-              <span className="total-val">{totalScore} / 720</span>
-            </div>
-          </div>
         </div>
 
         {/* Results Panel */}

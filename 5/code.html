@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEET Prep Admin - Guide Counselling</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#d2312c",
+                        "on-secondary": "#402d00",
+                        "tertiary-fixed-dim": "#ffb4ab",
+                        "surface-container": "#201f20",
+                        "error": "#ffb4ab",
+                        "background": "#131314",
+                        "on-tertiary": "#690005",
+                        "tertiary": "#ffb4ab",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e2e3",
+                        "on-tertiary-container": "#fff2f0",
+                        "on-surface-variant": "#e4beba",
+                        "surface-tint": "#ffb3ac",
+                        "primary-fixed": "#ffdad6",
+                        "primary-container": "#d32f2f",
+                        "inverse-on-surface": "#313031",
+                        "on-surface": "#e5e2e3",
+                        "surface-dim": "#131314",
+                        "on-secondary-fixed": "#261a00",
+                        "primary": "#ffb3ac",
+                        "on-primary": "#680008",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#2a2a2b",
+                        "on-primary-container": "#fff2f0",
+                        "secondary-container": "#d9a200",
+                        "on-secondary-container": "#533c00",
+                        "inverse-primary": "#ba1a20",
+                        "on-background": "#e5e2e3",
+                        "on-tertiary-fixed-variant": "#93000b",
+                        "secondary": "#f8bd2a",
+                        "surface-container-lowest": "#0e0e0f",
+                        "surface": "#131314",
+                        "surface-container-highest": "#353436",
+                        "secondary-fixed-dim": "#f8bd2a",
+                        "on-primary-fixed-variant": "#930010",
+                        "on-primary-fixed": "#410003",
+                        "error-container": "#93000a",
+                        "outline": "#ab8985",
+                        "surface-bright": "#39393a",
+                        "primary-fixed-dim": "#ffb3ac",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "surface-variant": "#353436",
+                        "secondary-fixed": "#ffdfa0",
+                        "on-tertiary-fixed": "#410002",
+                        "tertiary-fixed": "#ffdad6",
+                        "surface-container-low": "#1c1b1c",
+                        "outline-variant": "#5b403d"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "display": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #131314;
+            color: #e5e2e3;
+        }
+    </style>
+</head>
+<body class="font-body selection:bg-primary-container selection:text-white">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-50 bg-[#1C1B1C] shadow-2xl shadow-black font-['Space_Grotesk'] tracking-tight flex flex-col p-6">
+<div class="mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-gradient-to-br from-primary-container to-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="text-2xl font-bold tracking-tighter text-white">NEET Prep</h1>
+<p class="text-xs text-zinc-500 uppercase tracking-widest font-bold">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>User Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">quiz</span>
+<span>Q/A Management</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">school</span>
+<span>Admission Counselling</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600/20 to-transparent text-[#EF4444] font-bold rounded-lg scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+<span>Guide Counselling</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-3 px-2">
+<img class="w-10 h-10 rounded-full border border-primary/20 object-cover" data-alt="professional headshot of a middle-aged male administrator with a confident smile against a dark studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrkZkWBpeSWbtGajgF7BKul2EzzKXASDneUDYKBb3g9OkcHURASnLqkk8vj6vrLuRPlWvOZLmPG_U4YOf7361J0y9GWL4XK6CtcfKoaXihJJDuxANrjsvUl1t2PKQ8doS8NJoUMVXFXqJ10wIeUCpJ_8NO3H7rDRn-ymPfdPzBw97YB0bg-NHibTF0UebEDYKT3cqBhtUJQF7IwKt-Ge1Dc23yEejiifciYzVZ-fbtjooUrlErFlO9KrnC0u33nix7ohPJUO8WhlVi"/>
+<div>
+<p class="text-sm font-bold text-on-surface">Dr. Vikram Shah</p>
+<p class="text-[10px] text-zinc-500 uppercase font-bold tracking-wider">Chief Counsellor</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="sticky top-0 right-0 w-[calc(100%-16rem)] ml-64 h-20 bg-[#131314]/80 backdrop-blur-md flex justify-between items-center px-10 z-40 font-['Space_Grotesk'] font-medium">
+<div class="flex items-center gap-6">
+<h2 class="text-2xl font-bold tracking-tight text-on-surface">Guide Counselling</h2>
+<div class="h-8 w-[1px] bg-outline-variant/30"></div>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-primary transition-colors">search</span>
+<input class="bg-surface-container-highest border-none rounded-full pl-10 pr-6 py-2 text-sm w-80 focus:ring-1 focus:ring-primary/40 transition-all" placeholder="Search students or sessions..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">notifications</button>
+<button class="material-symbols-outlined text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">settings</button>
+<button class="material-symbols-outlined text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">help</button>
+</div>
+<button class="bg-gradient-to-br from-primary-container to-primary px-5 py-2 rounded-lg text-sm font-bold text-white shadow-lg shadow-primary-container/20 flex items-center gap-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Session
+            </button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-64 p-10 min-h-screen">
+<!-- Hero Header -->
+<div class="mb-12">
+<h3 class="font-headline text-5xl font-extrabold tracking-tighter mb-4">Performance Recommendations</h3>
+<p class="text-zinc-400 max-w-2xl text-lg leading-relaxed font-light">Deep dive into student academic trajectories, identifying kinetic learning opportunities and optimizing session schedules for high-velocity prep.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-12 gap-6">
+<!-- Student Spotlight Card (Asymmetric) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container rounded-2xl overflow-hidden relative group border border-outline-variant/10 shadow-xl">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+<div class="p-8 flex flex-col md:flex-row gap-8 relative z-10">
+<div class="shrink-0">
+<div class="relative">
+<img class="w-40 h-40 rounded-2xl object-cover shadow-2xl" data-alt="close-up of a diverse female student focused on studying with modern headphones in a high-tech library environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAt1uBbK2yC_QJM0GGQ6dhb-2iJk8Vka7MlQWsX7cKQ1fPvVI2D6VefUItsmSCBy-d4QfNjp_A7_FfVgLHA5diMRHsZ-FuTjNPK4aJI5Ykku9xZBBmI8Y7NsdMUdnEzsZjqDMS1z-2J5BKXjM45DcuzrqnGxGV_5IirJYAzzxBOEvduGrMIgLFGxe3-AvDuShBTLfJ9UpIINoM7hKldTPv9i9dbplj2Ie_AEowFx-mlMsBIPqtrGZcXUI2HG06tmvj5b6gQ0iwlYScU"/>
+<div class="absolute -bottom-3 -right-3 bg-secondary p-2 rounded-xl text-on-secondary font-bold text-xs flex items-center gap-1 shadow-lg">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+                                98.4th Percentile
+                            </div>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start mb-6">
+<div>
+<span class="text-secondary font-bold text-[10px] tracking-widest uppercase bg-secondary/10 px-2 py-1 rounded">Active Spotlight</span>
+<h4 class="text-3xl font-headline font-bold text-white mt-2">Aarav Deshmukh</h4>
+<p class="text-zinc-500 font-medium">NEET UG 2025 Aspirant | Batch Alpha-4</p>
+</div>
+<button class="text-primary material-symbols-outlined hover:bg-primary/10 p-2 rounded-full transition-colors">more_vert</button>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-zinc-500 text-xs uppercase tracking-wider mb-1 font-bold">Accuracy</p>
+<p class="text-2xl font-headline font-bold text-white">92%</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-zinc-500 text-xs uppercase tracking-wider mb-1 font-bold">Velocity</p>
+<p class="text-2xl font-headline font-bold text-white">1.2m/q</p>
+</div>
+<div class="bg-surface-container-low p-4 rounded-xl">
+<p class="text-zinc-500 text-xs uppercase tracking-wider mb-1 font-bold">Consistency</p>
+<p class="text-2xl font-headline font-bold text-white">High</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Progress Line Chart Visualization (Simplified) -->
+<div class="px-8 pb-8">
+<div class="flex items-center justify-between mb-4">
+<h5 class="text-sm font-bold text-zinc-300">Bi-Weekly Performance Delta</h5>
+<div class="flex gap-4">
+<div class="flex items-center gap-2 text-[10px] uppercase font-bold text-zinc-500">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Physics
+                            </div>
+<div class="flex items-center gap-2 text-[10px] uppercase font-bold text-zinc-500">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Biology
+                            </div>
+</div>
+</div>
+<div class="h-32 w-full flex items-end gap-1">
+<div class="w-full bg-surface-container-highest rounded-t-md h-[40%] hover:h-[45%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-primary-container rounded-t-md h-[60%] hover:h-[65%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-surface-container-highest rounded-t-md h-[55%] hover:h-[60%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-primary-container rounded-t-md h-[80%] hover:h-[85%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-surface-container-highest rounded-t-md h-[70%] hover:h-[75%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-primary-container rounded-t-md h-[95%] hover:h-[100%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-secondary rounded-t-md h-[85%] hover:h-[90%] transition-all duration-500 cursor-pointer"></div>
+<div class="w-full bg-surface-container-highest rounded-t-md h-[75%] hover:h-[80%] transition-all duration-500 cursor-pointer"></div>
+</div>
+</div>
+</div>
+<!-- Session Tracking Card -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-6">
+<div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/10 h-full">
+<div class="flex items-center justify-between mb-8">
+<h4 class="font-headline text-xl font-bold">Upcoming Sessions</h4>
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-2 py-1 rounded">3 TODAY</span>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<p class="text-xs font-bold text-zinc-500">10:00</p>
+<div class="w-[2px] h-full bg-outline-variant/30 my-2"></div>
+</div>
+<div class="bg-surface-container p-4 rounded-xl flex-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<p class="font-bold text-sm">Organic Chemistry Reset</p>
+<span class="material-symbols-outlined text-zinc-600 group-hover:text-primary transition-colors text-lg">arrow_forward_ios</span>
+</div>
+<div class="flex items-center gap-2">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="professional portrait of a male educator in a minimal setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZCCIbRz_LfodT8ocyF9xO8DfPhr3cfnShd3_W9IfwOZVSUYSN93v5l15bPxIxI1DCRaUBOK_-hvJrErWl8tv8WkQ4C9eYoql0pdInYgHpcqAfx1ieHLRTz18PpJai5rSpo7uIFfaiJxj47jDkckpuli8yxHA_dv8K572ap3uB2ShVJN-qfZIyDKmqQSxato5EeOWy14o3Y8uI-jrBeQK5iUfn7mTp27FaF9WnnK_aY1YJoWpL1LKLmkAf99TyKnNc8ST1ReM7nvFY"/>
+<p class="text-[10px] text-zinc-500 font-medium">Prof. S. Iyer</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<p class="text-xs font-bold text-zinc-500">14:30</p>
+<div class="w-[2px] h-full bg-outline-variant/30 my-2"></div>
+</div>
+<div class="bg-surface-container p-4 rounded-xl flex-1 hover:bg-surface-container-high transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<p class="font-bold text-sm">Physics Numerical Sprint</p>
+<span class="material-symbols-outlined text-zinc-600 group-hover:text-primary transition-colors text-lg">arrow_forward_ios</span>
+</div>
+<div class="flex items-center gap-2">
+<img class="w-5 h-5 rounded-full object-cover" data-alt="portrait of a confident female educator with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDTZYGxbQfYA8v1laWHNKtbaANRdO9clYmlsRvVYvARWYt6bvsPYcKY-LZLmLIglkNxR8z7PFi6RUce6w7uqBVAmwJAkSc0qbXDiE53E5l11hLfQmNncXGuMf-RtxZhhftA5XDsbL0zImjqX-Ca6pk7jxbQqfC3Gg3MV1YKR4HG3imNVk35flaW4_yxfzGopA1fjakmXBXiDlK16NketylDcwtrI2nMpoybO8Ko_cCKKubchftOdGFHr73uyFJjP28Z4RupIt0GkuT"/>
+<p class="text-[10px] text-zinc-500 font-medium">Dr. Emily Chen</p>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex flex-col items-center">
+<p class="text-xs font-bold text-zinc-500">17:15</p>
+</div>
+<div class="bg-primary/5 p-4 rounded-xl border border-primary/20 flex-1 hover:bg-primary/10 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<p class="font-bold text-sm text-primary">Strategic Review</p>
+<span class="material-symbols-outlined text-primary/60 group-hover:text-primary transition-colors text-lg">arrow_forward_ios</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-full bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px] text-white" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<p class="text-[10px] text-primary/80 font-bold uppercase">Self Study Slot</p>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full mt-8 py-3 rounded-xl border border-outline-variant/30 text-zinc-400 font-bold text-xs hover:border-primary/40 hover:text-white transition-all uppercase tracking-widest">View Full Schedule</button>
+</div>
+</div>
+<!-- Weak Areas (Grid Sub-section) -->
+<div class="col-span-12 md:col-span-6 lg:col-span-4 bg-surface-container rounded-2xl p-8 border border-outline-variant/10">
+<div class="flex items-center gap-4 mb-8">
+<div class="w-12 h-12 bg-error-container/20 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-lg">Weak Areas</h4>
+<p class="text-xs text-zinc-500 font-medium">Critical focus required immediately</p>
+</div>
+</div>
+<div class="space-y-6">
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span class="text-zinc-300">Thermodynamics</span>
+<span class="text-error">Critical (34%)</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-error rounded-full" style="width: 34%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span class="text-zinc-300">Genetics &amp; Evolution</span>
+<span class="text-secondary">Low (48%)</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 48%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-xs font-bold mb-2">
+<span class="text-zinc-300">Coordination Compounds</span>
+<span class="text-secondary">Stagnant (52%)</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary rounded-full" style="width: 52%"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<p class="text-[11px] text-zinc-400 italic">"Focus on NCERT Page 45-60 for Genetics; frequent error pattern detected in MCQs."</p>
+</div>
+</div>
+</div>
+<!-- Suggested Action Plan -->
+<div class="col-span-12 md:col-span-6 lg:col-span-8 bg-surface-container-low rounded-2xl p-8 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-8">
+<span class="material-symbols-outlined text-8xl text-outline-variant/5">sticky_note_2</span>
+</div>
+<h4 class="font-headline text-2xl font-bold mb-8">Suggested Academic Pivot</h4>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0">01</div>
+<div>
+<p class="font-bold text-white mb-1">Intensive Physics Lab</p>
+<p class="text-xs text-zinc-500 leading-relaxed">Allocate 3 extra hours for rotational mechanics and thermodynamics simulations.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0">02</div>
+<div>
+<p class="font-bold text-white mb-1">Biology Active Recall</p>
+<p class="text-xs text-zinc-500 leading-relaxed">Implement Spaced Repetition for Botanical nomenclature and Human Physiology.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs shrink-0">03</div>
+<div>
+<p class="font-bold text-white mb-1">Simulated Mock Phase</p>
+<p class="text-xs text-zinc-500 leading-relaxed">Transition to full-length mocks every Sunday with 2:00 PM - 5:20 PM strict slot.</p>
+</div>
+</div>
+</div>
+<div class="bg-surface-container p-6 rounded-2xl relative">
+<h5 class="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">Counsellor Notes</h5>
+<p class="text-sm text-on-surface leading-loose italic">
+                            "Student shows high anxiety during mock Physics sections. Recommended a 10-minute mindfulness reset between Biology and Physics. Performance in Organic Chemistry is improving; maintain current trajectory."
+                        </p>
+<div class="mt-6 flex items-center justify-between">
+<div class="flex -space-x-2">
+<img class="w-6 h-6 rounded-full border border-background object-cover" data-alt="face of a middle-aged female professor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPlr1FdDjVuipKIlCFgjjSVdBL2NvvhBy-lTirJ48zFq0yWKdSMJL8o7wFqcPIqkdaGYv5gUl5VkFOwCEjMdX8srlFyxPn7h5nTK6fvAJuiHN-vxz2K1LnkkrCvzJ8z-ghtOgeqDEBdKDe5ajnv1ypkCUYL4gcd9Hcrr_UTszne4cTlUYD_ErTDDn-V_CrUUcs1BmWAUtRLV42uzPYym1MhPyGYbU4EKB-uCEcfOYpKk18WsNV3ZiJ8tjPwh7u0A3HIzoyBVNZ4BhS"/>
+<img class="w-6 h-6 rounded-full border border-background object-cover" data-alt="face of a mature male scholar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXX_bNfiTqHqgI6PHiGT6zUaclG1r4Q3sfiOibmdb0tA0X0JIJdw5MsPiB7AqSevwX0lhIelVE6_Y_xhehEclAx0SQzbbMr773tEFnnwMOQc2ojTy7lDG3kJDJUm-mkuKmb0FPwcT3OfroR0zLw7W9GiKyh087ZydJKH1ArHszde61_YoOyWk4JlwvBNOrtS-0O0v0X0UdkBcyvdCJuoI4QIRFvjDQPv6YYpzfjUk3cCKPEEtxKG4Lri3m7GYZDTyO9bidhBOca3OJ"/>
+</div>
+<span class="text-[10px] text-zinc-500 font-bold">Updated 2 hours ago</span>
+</div>
+</div>
+</div>
+<div class="mt-10 flex gap-4">
+<button class="flex-1 bg-gradient-to-r from-primary-container to-tertiary-container py-4 rounded-xl font-bold text-white shadow-xl shadow-primary-container/20 active:scale-95 transition-transform">Deploy Plan to Student App</button>
+<button class="px-8 bg-surface-container-highest py-4 rounded-xl font-bold text-white hover:bg-surface-bright transition-colors">Export PDF Report</button>
+</div>
+</div>
+</div>
+<!-- Footer Stats / Meta -->
+<footer class="mt-12 flex justify-between items-center text-zinc-600 border-t border-outline-variant/10 pt-8">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="text-xs font-bold uppercase tracking-wider">System Live: 100% Sync</span>
+</div>
+<p class="text-xs">Database Refreshed: 14:02 IST</p>
+</div>
+<div class="flex gap-6">
+<a class="text-xs hover:text-white transition-colors" href="#">API Status</a>
+<a class="text-xs hover:text-white transition-colors" href="#">Data Privacy Policy</a>
+<a class="text-xs hover:text-white transition-colors" href="#">Admin Support</a>
+</div>
+</footer>
+</main>
+<!-- FAB for Quick Actions (Suppressed based on logic but included for potential context) -->
+<!-- Not rendered as per Contextual FAB Suppression rule for Detail/Management screens -->
+</body></html>

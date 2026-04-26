@@ -4,33 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../utils/api'
 import './Dashboard.css'
 
-// Static news (can be replaced with API later)
-const QA_LIST = [
-  {
-    id: 1, 
-    q: 'How are state quotas determined for NRI students?',
-    a: 'NRI students must check individual state policies. Typically, 15% seats in deemed universities are reserved for NRI candidates.',
-    date: '1h ago', admin: 'Dr. Sharma'
-  },
-  {
-    id: 2, 
-    q: 'Is the new choice filling rule applicable to Round 2?',
-    a: 'Yes, as per MCC 2024 guidelines, fresh choice filling is mandatory for all upgraded seats in Round 2.',
-    date: '3h ago', admin: 'Admin Panel'
-  },
-  {
-    id: 3, 
-    q: 'What happens if I miss the reporting deadline for my allotted college?',
-    a: 'Your allotment will be cancelled and your security deposit may be forfeited depending on the round. Always report on time.',
-    date: '1d ago', admin: 'Directorate'
-  },
-  {
-    id: 4, 
-    q: 'Can I apply for AIQ and State counselling simultaneously?',
-    a: 'Yes! Most students do both. Just ensure you coordinate the deadlines and reporting requirements carefully.',
-    date: '2d ago', admin: 'Counsellor Amit'
-  }
-]
+// Removed static QA_LIST
 
 const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 const MONTH_NAME = 'April 2025'
@@ -52,28 +26,53 @@ export default function Dashboard() {
   const [tooltip, setTooltip] = useState(null)
   const [hoveredDay, setHoveredDay] = useState(null)
   const [loadingStats, setLoadingStats] = useState(true)
+  const [qaPosts, setQaPosts] = useState([])
+  const [showAskModal, setShowAskModal] = useState(false)
+  const [newQuestion, setNewQuestion] = useState('')
+  const [posting, setPosting] = useState(false)
 
   useEffect(() => {
     if (!user) { setLoadingStats(false); return }
     Promise.all([
       apiFetch('/user/stats').catch(() => null),
       apiFetch('/user/attempts').catch(() => []),
-    ]).then(([s, a]) => {
+      apiFetch('/qa').catch(() => [])
+    ]).then(([s, a, q]) => {
       setStats(s)
       setRecentAttempts(a || [])
+      setQaPosts(q || [])
     }).finally(() => setLoadingStats(false))
   }, [user])
 
-  // Build streak days from recent attempts (last 30 days)
-  const STREAK_DAYS = new Set(
-    recentAttempts.map(a => new Date(a.createdAt).getDate())
-  )
-  if (STREAK_DAYS.size === 0) {
-    // Fallback decorative streak for new users
-    ;[1,2,4,5,7,8,9,11,12].forEach(d => STREAK_DAYS.add(d))
+  const handlePostQuestion = async (e) => {
+    e.preventDefault()
+    if (!newQuestion.trim()) return
+    setPosting(true)
+    try {
+      await apiFetch('/qa/question', {
+        method: 'POST',
+        body: JSON.stringify({ content: newQuestion })
+      })
+      setNewQuestion('')
+      setShowAskModal(false)
+      alert('Your question has been submitted! Our counsellors will answer shortly.')
+      const q = await apiFetch('/qa').catch(() => [])
+      setQaPosts(q || [])
+    } catch (err) {
+      alert(err.message || 'Failed to post question')
+    } finally {
+      setPosting(false)
+    }
   }
 
-  const streakCount = [...STREAK_DAYS].filter(d => d <= TODAY).length
+  const streakCount = stats?.streak ?? user?.streak ?? 0
+
+  // Build streak days by highlighting consecutive days ending today
+  const STREAK_DAYS = new Set()
+  for (let i = 0; i < streakCount; i++) {
+    const d = TODAY - i
+    if (d > 0) STREAK_DAYS.add(d)
+  }
 
   const STAT_CARDS = [
     {
@@ -128,6 +127,47 @@ export default function Dashboard() {
 
   return (
     <div className="page-container">
+      {/* Ask Question Modal */}
+      {showAskModal && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 1000,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+        }}>
+          <div className="card animate-in" style={{ width: '100%', maxWidth: '540px', padding: '2rem', background: 'var(--surface-container)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h2 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Ask a Counselling Question</h2>
+              <button onClick={() => setShowAskModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--on-surface-variant)' }}>
+                <span className="material-icons">close</span>
+              </button>
+            </div>
+            <p style={{ fontSize: '0.85rem', color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>
+              Your question will be reviewed and answered by our counsellors before appearing on the forum.
+            </p>
+            <form onSubmit={handlePostQuestion}>
+              <textarea
+                style={{
+                  width: '100%', minHeight: '120px', background: 'var(--surface-container-highest)',
+                  border: '1px solid var(--outline-variant)', borderRadius: '0.75rem',
+                  padding: '1rem', color: 'var(--on-surface)', fontSize: '0.95rem',
+                  outline: 'none', resize: 'vertical', boxSizing: 'border-box'
+                }}
+                placeholder="e.g. With rank 45,000 OBC category, which state should I prefer for state counselling?"
+                value={newQuestion}
+                onChange={e => setNewQuestion(e.target.value)}
+                required
+              />
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                <button type="button" className="btn-secondary" onClick={() => setShowAskModal(false)}>Cancel</button>
+                <button type="submit" className="btn-primary" disabled={posting || !newQuestion.trim()}>
+                  <span className="material-icons">send</span>
+                  {posting ? 'Submitting...' : 'Submit Question'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Welcome header */}
       <div className="dash-header animate-in">
         <div>
@@ -174,23 +214,29 @@ export default function Dashboard() {
           <section className="animate-in">
             <div className="section-row">
               <p className="section-label">Q/A Forum Verified by Admins</p>
-              <Link to="/counselling-guide" className="view-all">Ask Question →</Link>
+              <button onClick={() => setShowAskModal(true)} className="view-all" style={{background: 'none', border: 'none', cursor: 'pointer', padding: 0}}>Ask Question →</button>
             </div>
             <div className="news-list" style={{ maxHeight: '380px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-              {QA_LIST.map(qa => (
+              {qaPosts.length === 0 ? <p className="text-on-surface-variant text-sm p-4">No Q&A posts yet. Ask the first question!</p> : qaPosts.slice(0, 4).map(qa => (
                 <article key={qa.id} className="news-card animate-in" style={{ padding: '1rem', background: 'var(--surface-container-low)' }}>
                   <div className="news-top" style={{ marginBottom: '0.5rem' }}>
                     <span className="material-icons news-tag-icon" style={{ color: 'var(--primary)' }}>help_outline</span>
-                    <span className="news-time">Asked by student • {qa.date}</span>
+                    <span className="news-time">Asked by {qa.user?.name || 'Student'} • {new Date(qa.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <h3 className="news-title" style={{ fontSize: '0.95rem', marginBottom: '0.5rem', lineHeight: 1.4 }}>Q: {qa.q}</h3>
-                  <div style={{ padding: '0.75rem', background: 'var(--surface-container-highest)', borderRadius: '0.5rem', borderLeft: '3px solid #4ade80' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-                      <span className="material-icons" style={{ fontSize: '0.9rem', color: '#4ade80' }}>verified</span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#4ade80' }}>Ans: {qa.admin}</span>
+                  <h3 className="news-title" style={{ fontSize: '0.95rem', marginBottom: '0.5rem', lineHeight: 1.4 }}>Q: {qa.content}</h3>
+                  {qa.answers && qa.answers.length > 0 ? (
+                    <div style={{ padding: '0.75rem', background: 'var(--surface-container-highest)', borderRadius: '0.5rem', borderLeft: '3px solid #4ade80' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+                        <span className="material-icons" style={{ fontSize: '0.9rem', color: '#4ade80' }}>verified</span>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#4ade80' }}>Ans: {qa.answers[0].user?.name || 'Admin'}</span>
+                      </div>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--on-surface)', lineHeight: 1.5 }}>{qa.answers[0].content}</p>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--on-surface)', lineHeight: 1.5 }}>{qa.a}</p>
-                  </div>
+                  ) : (
+                    <div style={{ padding: '0.5rem', background: 'var(--surface-container-highest)', borderRadius: '0.5rem', opacity: 0.7 }}>
+                      <p style={{ fontSize: '0.8rem', fontStyle: 'italic' }}>Pending expert answer...</p>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>

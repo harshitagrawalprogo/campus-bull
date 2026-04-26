@@ -7,6 +7,7 @@ import adminRoutes from './routes/admin.js'
 import userRoutes from './routes/user.js'
 import testRoutes from './routes/tests.js'
 import predictRoutes from './routes/predict.js'
+import qaRoutes from './routes/qa.js'
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/tests', testRoutes)
 app.use('/api/predict', predictRoutes)
+app.use('/api/qa', qaRoutes)
 
 // Default root response
 app.get('/api', (req, res) => {

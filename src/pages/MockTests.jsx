@@ -135,8 +135,8 @@ export default function MockTests() {
                 className="btn-primary"
                 style={{ width: '100%', justifyContent: 'center', marginTop: '1.25rem' }}
                 onClick={() => {
-                  if (!user) navigate('/login')
-                  else navigate(`/mock-test/${t.id}`)
+                  if (!user) navigate('/')
+                  else navigate(`/dashboard/mock-test/${t.id}`)
                 }}
               >
                 <span className="material-icons">play_arrow</span>

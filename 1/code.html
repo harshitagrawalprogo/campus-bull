@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NEET Prep - Admin Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#d2312c",
+                    "on-secondary": "#402d00",
+                    "tertiary-fixed-dim": "#ffb4ab",
+                    "surface-container": "#201f20",
+                    "error": "#ffb4ab",
+                    "background": "#131314",
+                    "on-tertiary": "#690005",
+                    "tertiary": "#ffb4ab",
+                    "on-error": "#690005",
+                    "inverse-surface": "#e5e2e3",
+                    "on-tertiary-container": "#fff2f0",
+                    "on-surface-variant": "#e4beba",
+                    "surface-tint": "#ffb3ac",
+                    "primary-fixed": "#ffdad6",
+                    "primary-container": "#d32f2f",
+                    "inverse-on-surface": "#313031",
+                    "on-surface": "#e5e2e3",
+                    "surface-dim": "#131314",
+                    "on-secondary-fixed": "#261a00",
+                    "primary": "#ffb3ac",
+                    "on-primary": "#680008",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-high": "#2a2a2b",
+                    "on-primary-container": "#fff2f0",
+                    "secondary-container": "#d9a200",
+                    "on-secondary-container": "#533c00",
+                    "inverse-primary": "#ba1a20",
+                    "on-background": "#e5e2e3",
+                    "on-tertiary-fixed-variant": "#93000b",
+                    "secondary": "#f8bd2a",
+                    "surface-container-lowest": "#0e0e0f",
+                    "surface": "#131314",
+                    "surface-container-highest": "#353436",
+                    "secondary-fixed-dim": "#f8bd2a",
+                    "on-primary-fixed-variant": "#930010",
+                    "on-primary-fixed": "#410003",
+                    "error-container": "#93000a",
+                    "outline": "#ab8985",
+                    "surface-bright": "#39393a",
+                    "primary-fixed-dim": "#ffb3ac",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "surface-variant": "#353436",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-tertiary-fixed": "#410002",
+                    "tertiary-fixed": "#ffdad6",
+                    "surface-container-low": "#1c1b1c",
+                    "outline-variant": "#5b403d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "display": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #131314; color: #e5e2e3; }
+        .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #131314; }
+        ::-webkit-scrollbar-thumb { background: #353436; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-50 bg-[#1C1B1C] shadow-2xl shadow-black flex flex-col p-6 font-['Space_Grotesk'] tracking-tight">
+<div class="mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-gradient-to-br from-primary-container to-primary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h1 class="text-2xl font-bold tracking-tighter text-white">NEET Prep</h1>
+<p class="text-[10px] uppercase tracking-[0.2em] text-zinc-500 font-bold">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-red-600/20 to-transparent text-[#EF4444] font-bold rounded-lg transition-transform scale-95 active:scale-90" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">group</span>
+                User Management
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">quiz</span>
+                Q/A Management
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">school</span>
+                Admission Counselling
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 transition-all duration-300 hover:bg-zinc-800/50" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+                Guide Counselling
+            </a>
+</nav>
+<div class="mt-auto pt-6 border-t border-white/5 flex items-center gap-3">
+<img alt="Admin User" class="w-10 h-10 rounded-full border-2 border-primary-container/30" data-alt="close up professional portrait of a south asian male educational administrator in a modern office environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAllERIRgscALenvo4_MxZK4CeLkiLrjW7zFHigQDoV1b2xqMTORYd8T5mPA3yhAb6Kh0gOyqO-qlv_lg2ubbMThhI0qb_zaAjOU8Blghv7aiMTz6q9RmGh6m9phQvx9CbkRSqEG6MR3tanGQPgdLaeD38kODEFiDdIPucbm-MJeqtni0qnQ3NhHU1L-pm7_V5I6AACDVx-CCndn7Y7VDtsWJ1eHC0R97c7lEAENrI1ODKNHNwRoGX3kqqpPjEVHi-PZ_3kaJ1pYovY"/>
+<div class="overflow-hidden">
+<p class="text-sm font-bold text-white truncate">Dr. Shaurya</p>
+<p class="text-xs text-zinc-500 truncate">Super Admin</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Shell -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-40 bg-[#131314]/80 backdrop-blur-md h-20 flex justify-between items-center px-10 w-full font-['Space_Grotesk'] font-medium">
+<div class="flex items-center gap-4 bg-surface-container-low px-4 py-2 rounded-full w-96">
+<span class="material-symbols-outlined text-zinc-400">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm text-on-surface w-full" placeholder="Search students, tests, or guides..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 mr-4 border-r border-white/10 pr-6">
+<button class="relative text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<button class="text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="text-zinc-400 hover:text-white transition-colors cursor-pointer active:opacity-70">
+<span class="material-symbols-outlined">help</span>
+</button>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-xs text-zinc-500">System Status</span>
+<span class="text-xs text-emerald-500 flex items-center gap-1">
+<span class="w-1 h-1 bg-emerald-500 rounded-full"></span> Operational
+                    </span>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-10 max-w-7xl mx-auto space-y-12">
+<!-- Hero Heading Section -->
+<section class="space-y-2">
+<h2 class="text-5xl font-bold font-headline tracking-tight text-white">Console Overview</h2>
+<p class="text-zinc-400 max-w-2xl font-light">Real-time performance analytics and administrative control for the NEET Prep ecosystem.</p>
+</section>
+<!-- KPI Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+<div class="lg:col-span-2 bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors group">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-primary text-3xl">group</span>
+<span class="text-emerald-500 text-xs font-bold bg-emerald-500/10 px-2 py-1 rounded">+12%</span>
+</div>
+<div>
+<p class="text-4xl font-headline font-bold text-white mt-4">24,592</p>
+<p class="text-zinc-500 text-sm font-medium uppercase tracking-wider mt-1">Total Students</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-secondary text-3xl">bolt</span>
+<div>
+<p class="text-3xl font-headline font-bold text-white">4,810</p>
+<p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Active Now</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl">assignment</span>
+<div>
+<p class="text-3xl font-headline font-bold text-white">1.2M</p>
+<p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Tests Taken</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl flex flex-col justify-between hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-secondary text-3xl">grade</span>
+<div>
+<p class="text-3xl font-headline font-bold text-white">584</p>
+<p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Avg Score</p>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-2xl border-l-4 border-primary/40 flex flex-col justify-between hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary text-3xl">contact_support</span>
+<div>
+<p class="text-3xl font-headline font-bold text-white">142</p>
+<p class="text-zinc-500 text-xs font-medium uppercase tracking-wider">Pending Qs</p>
+</div>
+</div>
+</div>
+<!-- Visualization Layer -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Main Growth Chart -->
+<div class="lg:col-span-2 bg-surface-container-low p-8 rounded-3xl relative overflow-hidden">
+<div class="flex justify-between items-center mb-10">
+<div>
+<h3 class="text-xl font-headline font-bold text-white">User Growth Analysis</h3>
+<p class="text-sm text-zinc-500">Student enrollment trends over the last 30 days</p>
+</div>
+<select class="bg-surface-container-highest border-none text-xs rounded-lg px-4 py-2 text-white focus:ring-1 focus:ring-primary">
+<option>Last 30 Days</option>
+<option>Last 6 Months</option>
+</select>
+</div>
+<!-- Simulated Graph -->
+<div class="relative h-64 flex items-end gap-1 px-2">
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[40%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[55%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[45%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[70%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[85%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[60%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[95%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[80%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[100%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[75%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[90%] transition-all hover:brightness-125"></div>
+<div class="flex-1 bg-gradient-to-t from-primary/20 to-primary/40 rounded-t-lg h-[65%] transition-all hover:brightness-125"></div>
+</div>
+<div class="flex justify-between text-[10px] text-zinc-600 mt-4 uppercase font-bold tracking-widest px-2">
+<span>Week 1</span>
+<span>Week 2</span>
+<span>Week 3</span>
+<span>Week 4</span>
+</div>
+</div>
+<!-- Counselling Column -->
+<div class="bg-surface-container-low p-8 rounded-3xl flex flex-col">
+<h3 class="text-xl font-headline font-bold text-white mb-6">Today's Sessions</h3>
+<div class="space-y-4 overflow-y-auto max-h-[350px] pr-2">
+<!-- Session Card -->
+<div class="p-4 bg-surface-container rounded-2xl flex items-center gap-4 group hover:bg-surface-container-high transition-all">
+<div class="relative">
+<img alt="Student" class="w-12 h-12 rounded-xl object-cover" data-alt="Portrait of a young indian female student smiling softly, wearing a neutral colored top, blurred library background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3Nu7Rx1BKMjI9eLw9pFz4ZreOeHhV2Tn1arRbhVbMT9I89thR2vbh0QPbbRCX_5kDgU23bXSfu7AK5w98NAjDsR-ZG6s89cMiPJtwuHmXsKrIUyDTZo8NPtl_W9vmXeCWVEe8lZ3k8TbABx-rzRNhjISg4XStHNKHyjBgmY11F6eaxWahVkKs_Hs4U_13_z7Hu1hyM2TsZpSnJd4USaoucgwALbWvIly_lHxGs3jVa2R9eRGSVmdNh6rNTzPIU4zET6y1pViH6w02"/>
+<span class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary rounded-full border-2 border-surface-container"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-white">Ananya Iyer</p>
+<p class="text-xs text-zinc-500">14:30 • Medical Ethics</p>
+</div>
+<button class="material-symbols-outlined text-zinc-500 group-hover:text-primary transition-colors">arrow_forward_ios</button>
+</div>
+<!-- Session Card -->
+<div class="p-4 bg-surface-container rounded-2xl flex items-center gap-4 group hover:bg-surface-container-high transition-all">
+<div class="relative">
+<img alt="Student" class="w-12 h-12 rounded-xl object-cover" data-alt="Portrait of a focused young indian male student with glasses, clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVI1EsNjgMKbKOO0IH_IrqAAL_m1esERTsx0zoIQwkiWRE-RNiCHyG-2LWSnkjPqfV1qwGj8cdUy2YlEKMSPw6E2po1ysvMfvvks6FRPNpBBlIPFhnHoXZyHbWjj-XHugYCfdTo2PaqvYNA55u-cxtVfJ9RcpO4QlvC9HqNSociwCmkv7uPITIQppojtSYHIWLKbHaKa-e_Vrhga_uhgxmvofoRien7GimSG1v5uD5RFZdbvUBjbfme7Q7cf45CcpPS90_inB_2_kW"/>
+<span class="absolute -bottom-1 -right-1 w-3 h-3 bg-secondary rounded-full border-2 border-surface-container"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-white">Rohan Das</p>
+<p class="text-xs text-zinc-500">16:00 • Exam Anxiety</p>
+</div>
+<button class="material-symbols-outlined text-zinc-500 group-hover:text-primary transition-colors">arrow_forward_ios</button>
+</div>
+<!-- Session Card -->
+<div class="p-4 bg-surface-container rounded-2xl flex items-center gap-4 group hover:bg-surface-container-high transition-all opacity-60">
+<div class="relative">
+<img alt="Student" class="w-12 h-12 rounded-xl object-cover" data-alt="Portrait of a young indian female student with a ponytail, looking confident, bright daylight lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKGyEp7N9eueYMBHsqAmYLT67hcChiFvXfTZYPjwHvvk532DvFYqgLd0VamkpAgz7qMPgNXHlXX1noysbZqxgcugD5eJ5LbXTCPgviFVJwMxCN37Ipxy6KjYgdb2IfduHZDWUX-0j21khn3b35IBzig56t7A0mfMVOgcuTPQ_XNpxnnQmGVmcKTJ8Cl9uhztjmPYAV0Yap7dMLnV-8X7EmLdnN4bn4xmc3zHqd5hXUbPUftvEKffw-40p_B-bbPQRQd_ma4tYeiYaj"/>
+<span class="absolute -bottom-1 -right-1 w-3 h-3 bg-zinc-600 rounded-full border-2 border-surface-container"></span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-white">Priya Sharma</p>
+<p class="text-xs text-zinc-500">10:00 • COMPLETED</p>
+</div>
+<button class="material-symbols-outlined text-zinc-500">check_circle</button>
+</div>
+</div>
+<button class="mt-auto pt-6 w-full text-center text-xs font-bold text-primary uppercase tracking-widest hover:underline transition-all">View Full Schedule</button>
+</div>
+</div>
+<!-- Bottom Row: Performance & Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+<!-- Test Performance Bar Chart -->
+<div class="bg-surface-container-low p-8 rounded-3xl">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-headline font-bold text-white">Subject Performance</h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-primary"></span> <span class="text-[10px] text-zinc-500 uppercase">Physics</span></div>
+<div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-secondary"></span> <span class="text-[10px] text-zinc-500 uppercase">Biology</span></div>
+</div>
+</div>
+<div class="space-y-6">
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-zinc-400"><span>Mock Series #12</span> <span>88% Efficiency</span></div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[88%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-zinc-400"><span>Daily Quiz Avg</span> <span>64% Efficiency</span></div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[64%] rounded-full"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-zinc-400"><span>Sectional: Organic Chem</span> <span>72% Efficiency</span></div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[72%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="bg-surface-container-low p-8 rounded-3xl relative overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-xl font-headline font-bold text-white">Live Activity</h3>
+<span class="flex h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
+</div>
+<div class="space-y-6">
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+<div>
+<p class="text-sm text-on-surface font-medium">New subscription purchase: <span class="text-white">Vikram K.</span></p>
+<p class="text-[10px] text-zinc-500">2 minutes ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-sm">task_alt</span>
+</div>
+<div>
+<p class="text-sm text-on-surface font-medium">Test Bank updated: <span class="text-white">Physics Vol 2.0</span></p>
+<p class="text-[10px] text-zinc-500">14 minutes ago</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-emerald-500 text-sm">login</span>
+</div>
+<div>
+<p class="text-sm text-on-surface font-medium">High load detected in <span class="text-white">Exam Portal</span></p>
+<p class="text-[10px] text-zinc-500">45 minutes ago</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Action Button (Suppressed on sub-pages, active here) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-primary-container to-primary rounded-2xl shadow-2xl shadow-primary-container/20 flex items-center justify-center text-white hover:scale-110 transition-transform active:scale-95 group z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+<span class="absolute right-16 bg-surface-container-highest px-3 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none font-bold">Quick Action</span>
+</button>
+</main>
+</body></html>

@@ -144,7 +144,7 @@ export default function MockTestInterface() {
             <span className="material-icons">play_arrow</span>
             Begin Test
           </button>
-          <button className="btn-ghost" onClick={() => navigate('/mock-tests')}>← Back to Tests</button>
+          <button className="btn-ghost" onClick={() => navigate('/dashboard/mock-tests')}>← Back to Tests</button>
         </div>
       </div>
     )
@@ -182,7 +182,7 @@ export default function MockTestInterface() {
               </div>
             ))}
           </div>
-          <button className="btn-primary" onClick={() => navigate('/mock-tests')}>
+          <button className="btn-primary" onClick={() => navigate('/dashboard/mock-tests')}>
             <span className="material-icons">arrow_back</span>
             Back to Tests
           </button>

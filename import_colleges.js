@@ -140,6 +140,10 @@ async function runImport() {
     process.exit(0);
   }
 
+  console.log("Clearing existing data...");
+  await prisma.collegeAllotment.deleteMany({});
+  await prisma.college.deleteMany({});
+
   console.log("Saving Colleges to Neon Postgres...");
   const collegeValues = Array.from(uniqueColleges.values());
   for (let i = 0; i < collegeValues.length; i += 500) {

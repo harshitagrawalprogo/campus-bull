@@ -93,31 +93,66 @@ router.post('/rank', async (req, res) => {
   }
 })
 
+// GET /api/predict/colleges — get list of college names
+router.get('/colleges', async (req, res) => {
+  try {
+    const { state, counsellingType } = req.query;
+    let whereClause = {};
+    if (counsellingType === 'State' && state && state !== 'All') {
+      whereClause.state = { equals: state, mode: 'insensitive' };
+    }
+    const colleges = await prisma.college.findMany({
+      where: whereClause,
+      select: { name: true },
+      orderBy: { name: 'asc' },
+      distinct: ['name']
+    });
+    res.json(colleges.map(c => c.name));
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to fetch colleges' });
+  }
+})
+
 // POST /api/predict/college — detailed college search
 router.post('/college', async (req, res) => {
   try {
-    const { rank, state, type } = req.body
+    const { rank, state, type, counsellingType, category, collegeName, budget, limit } = req.body
 
     if (!rank || rank < 0) {
       return res.status(400).json({ error: 'Valid rank is required' })
     }
 
+    // Build college-level filter
+    const collegeFilter = {}
+    if (state && state !== 'All') {
+      collegeFilter.state = { equals: state, mode: 'insensitive' }
+    }
+    if (type && type !== 'All') {
+      collegeFilter.type = { equals: type, mode: 'insensitive' }
+    }
+    if (collegeName && collegeName.trim()) {
+      collegeFilter.name = { contains: collegeName.trim(), mode: 'insensitive' }
+    }
+
+    // Build allotment-level filter
     const whereClause = {
       aiRank: { gte: parseInt(rank) }
     }
+    if (category && category !== 'All') {
+      whereClause.category = { contains: category, mode: 'insensitive' }
+    }
+    if (Object.keys(collegeFilter).length > 0) {
+      whereClause.college = collegeFilter
+    }
 
-    if (state && state !== 'All') {
-      whereClause.college = { state: { equals: state, mode: 'insensitive' } }
-    }
-    if (type && type !== 'All') {
-      whereClause.college = { ...whereClause.college, type: { equals: type, mode: 'insensitive' } }
-    }
+    const dbLimit = parseInt(limit) || 20
 
     const dbAllotments = await prisma.collegeAllotment.findMany({
       where: whereClause,
       include: { college: true },
       orderBy: { aiRank: 'asc' },
-      take: 20
+      take: dbLimit
     })
 
     const colleges = dbAllotments.map(a => ({
@@ -125,14 +160,17 @@ router.post('/college', async (req, res) => {
       state: a.college.state || 'All India',
       type: a.college.type || 'Government',
       minRank: Math.max(1, a.aiRank - 1500),
-      maxRank: a.aiRank
+      maxRank: a.aiRank,
+      category: a.category || category || 'General',
+      year: a.year || '2023',
+      round: a.round || '1'
     }))
 
     const total = await prisma.collegeAllotment.count({ where: whereClause })
 
     res.json({ rank, colleges, total })
   } catch (err) {
-    console.error(err)
+    console.error('College prediction error:', err)
     res.status(500).json({ error: 'College prediction failed' })
   }
 })

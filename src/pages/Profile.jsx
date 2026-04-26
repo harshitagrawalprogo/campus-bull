@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../utils/api'
 import './Profile.css'
@@ -16,12 +16,14 @@ const TARGET_YEARS = ['2025','2026','2027','2028']
 
 export default function Profile() {
   const { user, refetchUser } = useAuth()
+  const location = useLocation()
   const [form, setForm] = useState({
-    name: '', phone: '', branch: '', category: '', domicile: '', targetYear: ''
+    name: '', phone: '', branch: '', category: '', domicile: '', targetYear: '',
+    ugOrPg: '', address: '', bestRank: ''
   })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState(location.state?.message || '')
   const [attempts, setAttempts] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(true)
 
@@ -33,7 +35,10 @@ export default function Profile() {
         branch: user.branch || '',
         category: user.category || '',
         domicile: user.domicile || '',
-        targetYear: user.targetYear?.toString() || ''
+        targetYear: user.targetYear?.toString() || '',
+        ugOrPg: user.ugOrPg || '',
+        address: user.address || '',
+        bestRank: user.bestRank?.toString() || ''
       })
     }
   }, [user])
@@ -160,8 +165,37 @@ export default function Profile() {
                   <label className="field-label">Phone Number</label>
                   <div className="input-icon-wrap">
                     <span className="material-icons input-icon">phone</span>
-                    <input className="field-input with-icon" type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 98765 43210" />
+                    <input className="field-input with-icon" type="tel" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} placeholder="+91 98765 43210" required />
                   </div>
+                </div>
+                <div className="field-group" style={{ gridColumn: '1 / -1' }}>
+                  <label className="field-label">Address</label>
+                  <input className="field-input" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="Your full residential address" required />
+                </div>
+                <div className="field-group">
+                  <label className="field-label">Level (UG/PG)</label>
+                  <select className="field-select" value={form.ugOrPg} onChange={e => setForm({ ...form, ugOrPg: e.target.value })} required>
+                    <option value="">Select level</option>
+                    <option value="UG">Undergraduate (UG)</option>
+                    <option value="PG">Postgraduate (PG)</option>
+                  </select>
+                </div>
+                <div className="field-group">
+                  <label className="field-label">
+                    Best Rank 
+                    <span style={{ fontSize: '0.75rem', fontWeight: 400, color: 'var(--on-surface-variant)', marginLeft: '0.5rem' }}>
+                      (Updates left: {2 - (user.rankUpdates || 0)})
+                    </span>
+                  </label>
+                  <input 
+                    className="field-input" 
+                    type="number" 
+                    value={form.bestRank} 
+                    onChange={e => setForm({ ...form, bestRank: e.target.value })} 
+                    placeholder="Enter rank" 
+                    disabled={user.rankUpdates >= 2} 
+                    required 
+                  />
                 </div>
                 <div className="field-group">
                   <label className="field-label">Stream / Branch</label>

@@ -5,13 +5,13 @@ import campusBullLogo from '../campus-bull-logo.jpeg'
 import './Layout.css'
 
 const navItems = [
-  { to: '/',                   icon: 'dashboard',       label: 'Home'              },
-  { to: '/rank-predictor',     icon: 'insights',        label: 'Rank Predictor'    },
-  { to: '/mock-tests',         icon: 'quiz',            label: 'Mock Test'         },
-  { to: '/college-predictor',  icon: 'account_balance', label: 'College Predictor' },
-  { to: '/counselling-guide',  icon: 'menu_book',       label: 'Guide Counselling' },
-  { to: '/expert-counselling', icon: 'support_agent',   label: 'Expert Counselling'},
-  { to: '/profile',            icon: 'manage_accounts', label: 'My Profile'        },
+  { to: '/dashboard',                      icon: 'dashboard',       label: 'Home'                  },
+  { to: '/dashboard/rank-predictor',       icon: 'insights',        label: 'Rank Predictor'        },
+  { to: '/dashboard/mock-tests',           icon: 'quiz',            label: 'Mock Test'             },
+  { to: '/dashboard/college-predictor',    icon: 'account_balance', label: 'College Predictor'     },
+  { to: '/dashboard/admission-counselling',icon: 'how_to_reg',      label: 'Admission Counselling' },
+  { to: '/dashboard/expert-counselling',   icon: 'support_agent',   label: 'Expert Counselling'    },
+  { to: '/dashboard/profile',              icon: 'manage_accounts', label: 'My Profile'            },
 ]
 
 export default function Layout() {
@@ -25,7 +25,7 @@ export default function Layout() {
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
+    navigate('/')
   }
 
   const sendMessage = () => {
@@ -78,7 +78,7 @@ export default function Layout() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === '/'}
+              end={item.to === '/dashboard'}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
               <span className="material-icons">{item.icon}</span>
@@ -89,7 +89,7 @@ export default function Layout() {
           {user?.role === 'ADMIN' && (
             <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--on-surface-variant)', marginBottom: '0.5rem', paddingLeft: '1rem' }}>Admin Tools</div>
-              <NavLink to="/admin" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <NavLink to="/dashboard/admin" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 <span className="material-icons">admin_panel_settings</span>
                 <span>User Management</span>
               </NavLink>
@@ -104,7 +104,7 @@ export default function Layout() {
               <span>Logout</span>
             </button>
           ) : (
-            <button className="nav-item logout-btn" onClick={() => navigate('/login')} style={{ color: 'var(--primary)' }}>
+            <button className="nav-item logout-btn" onClick={() => navigate('/')} style={{ color: 'var(--primary)' }}>
               <span className="material-icons">login</span>
               <span>Login / Register</span>
             </button>
