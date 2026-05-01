@@ -10,6 +10,10 @@ export const getAuthToken = () => {
   return localStorage.getItem('token')
 }
 
+// In production (Vercel), VITE_API_URL = https://your-render-app.onrender.com
+// In development, it's empty so Vite's proxy handles /api → localhost:5000
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 // Helper for making API calls with the JWT token
 export const apiFetch = async (endpoint, options = {}) => {
   const token = getAuthToken()
@@ -23,12 +27,12 @@ export const apiFetch = async (endpoint, options = {}) => {
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  const response = await fetch(`/api${endpoint}`, {
+  const response = await fetch(`${API_BASE}/api${endpoint}`, {
     ...options,
     headers,
   })
 
-  // Optional: Automatically handle 401s by logging out here
+  // Automatically handle 401s by logging out
   if (response.status === 401 && endpoint !== '/auth/login' && endpoint !== '/auth/register') {
     setAuthToken(null)
   }
@@ -41,3 +45,4 @@ export const apiFetch = async (endpoint, options = {}) => {
 
   return data
 }
+

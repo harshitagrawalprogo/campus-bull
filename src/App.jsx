@@ -9,7 +9,7 @@ import MockTests from './pages/MockTests'
 import MockTestInterface from './pages/MockTestInterface'
 import CollegePredictor from './pages/CollegePredictor'
 import ExpertCounselling from './pages/ExpertCounselling'
-import AdminDashboard from './pages/AdminDashboard'
+import AdminDashboard from './pages/admin/AdminDashboard'
 import Profile from './pages/Profile'
 import AdmissionCounselling from './pages/AdmissionCounselling'
 
@@ -53,14 +53,15 @@ const AppRoutes = () => {
         <Route path="admission-counselling" element={<AdmissionCounselling />} />
         <Route path="expert-counselling" element={<ExpertCounselling />} />
         <Route path="profile" element={<Profile />} />
-        
-        {/* Admin only route */}
-        <Route path="admin" element={
-          <ProtectedRoute requireAdmin={true}>
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
       </Route>
+      
+      {/* Admin only route */}
+      <Route path="/admin" element={
+        <ProtectedRoute requireAdmin={true}>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

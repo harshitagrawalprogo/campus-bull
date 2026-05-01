@@ -8,10 +8,10 @@ import { PrismaPg } from '@prisma/adapter-pg'
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const pool = new Pool({ 
-  connectionString: 'postgresql://neondb_owner:npg_w5DnaiKCV0EP@54.209.204.248/neondb?sslmode=require&options=endpoint%3Dep-ancient-unit-am6by8o3-pooler&pgbouncer=true',
+  connectionString: 'postgresql://neondb_owner:npg_uQLIKlN1DhO2@100.51.95.243/neondb?sslmode=require&options=endpoint%3Dep-steep-butterfly-anxifkii-pooler&pgbouncer=true',
   ssl: { 
     rejectUnauthorized: false,
-    servername: 'ep-ancient-unit-am6by8o3-pooler.c-5.us-east-1.aws.neon.tech'
+    servername: 'ep-steep-butterfly-anxifkii-pooler.c-6.us-east-1.aws.neon.tech'
   }
 })
 
@@ -22,3 +22,4 @@ const globalForPrisma = globalThis
 export const prisma = new PrismaClient({ adapter })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+

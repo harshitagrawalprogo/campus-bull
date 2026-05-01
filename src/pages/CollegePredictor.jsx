@@ -3,22 +3,29 @@ import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../utils/api'
 import './CollegePredictor.css'
 
-const STATES = ['All', 'Andhra Pradesh', 'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu & Kashmir', 'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan', 'Tamil Nadu', 'Telangana', 'Tripura', 'UP', 'Uttarakhand', 'West Bengal']
+import { STATES_LIST } from '../constants/states'
 const TYPES  = ['All', 'Government', 'Private', 'AIIMS', 'Deemed']
+
 
 export default function CollegePredictor() {
   const { user } = useAuth()
 
   // Derive defaults from user profile
   const profileRank = user?.bestRank || ''
-  const profileCategory = user?.category || 'G'
+  const profileCategory = user?.category || 'All'
   const profileCourse = user?.ugOrPg || 'UG'
+  const profileState = STATES_LIST.find(s => s.label === user?.domicile)?.value || 'All'
 
   const [courseType,      setCourseType]       = useState(profileCourse)
-  const [stateFilter,     setStateFilter]     = useState('All')
+  const [stateFilter,     setStateFilter]     = useState(profileState)
   const [typeFilter,      setTypeFilter]       = useState('All')
-  const [counsellingType, setCounsellingType]  = useState('All')
+  const [counsellingType, setCounsellingType]  = useState(profileState === 'All' ? 'All' : 'State')
   const [category,        setCategory]         = useState(profileCategory)
+  const [dynamicCategories, setDynamicCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(false)
+  const [quota,           setQuota]            = useState('All')
+  const [dynamicQuotas,   setDynamicQuotas]    = useState([])
+  const [quotasLoading,   setQuotasLoading]    = useState(false)
   const [collegeSearch,   setCollegeSearch]    = useState('')
   const [collegeOptions,  setCollegeOptions]   = useState([])
   const [budget,          setBudget]           = useState('')
@@ -27,6 +34,7 @@ export default function CollegePredictor() {
   const [searched,        setSearched]         = useState(false)
   const [apiColleges,     setApiColleges]      = useState([])
   const [apiLoading,      setApiLoading]       = useState(false)
+  const [sortConfig,      setSortConfig]       = useState({ key: null, direction: 'asc' })
 
   // Sync profile values if user loads later
   useEffect(() => {
@@ -51,6 +59,50 @@ export default function CollegePredictor() {
     fetchColleges()
   }, [stateFilter, counsellingType])
 
+  // Fetch dynamic categories
+  useEffect(() => {
+    async function fetchCategories() {
+      setCategoriesLoading(true)
+      try {
+        const query = new URLSearchParams()
+        if (counsellingType !== 'All' && counsellingType !== 'MCC') query.append('counsellingType', counsellingType)
+        if (stateFilter !== 'All') query.append('state', stateFilter)
+        const res = await apiFetch(`/predict/categories?${query.toString()}`)
+        if (Array.isArray(res)) {
+          setDynamicCategories(res)
+          setCategory('All')
+        }
+      } catch (err) {
+        console.warn('Failed to fetch categories', err)
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+    fetchCategories()
+  }, [stateFilter, counsellingType])
+
+  // Fetch dynamic quotas
+  useEffect(() => {
+    async function fetchQuotas() {
+      setQuotasLoading(true)
+      try {
+        const query = new URLSearchParams()
+        if (counsellingType !== 'All' && counsellingType !== 'MCC') query.append('counsellingType', counsellingType)
+        if (stateFilter !== 'All') query.append('state', stateFilter)
+        const res = await apiFetch(`/predict/quotas?${query.toString()}`)
+        if (Array.isArray(res)) {
+          setDynamicQuotas(res)
+          setQuota('All')
+        }
+      } catch (err) {
+        console.warn('Failed to fetch quotas', err)
+      } finally {
+        setQuotasLoading(false)
+      }
+    }
+    fetchQuotas()
+  }, [stateFilter, counsellingType])
+
   const handleSearch = async () => {
     if (!rank) { alert('Please enter your NEET rank'); return }
     setSearched(true)
@@ -65,6 +117,7 @@ export default function CollegePredictor() {
           state: (counsellingType === 'State' && stateFilter !== 'All') ? stateFilter : undefined,
           counsellingType: counsellingType !== 'All' ? counsellingType : undefined,
           category: category,
+          quota: quota,
           collegeName: collegeSearch.trim() || undefined,
           budget: budget ? Number(budget) : undefined,
           limit: limit
@@ -81,10 +134,12 @@ export default function CollegePredictor() {
 
   const exportCSV = () => {
     if (!apiColleges.length) return
-    const headers = ['College Name', 'State', 'Institution Type', 'Seat Category', 'Round', 'Year', 'Cutoff Rank']
+    const headers = ['College Name', 'State', 'Institution Type', 'Seat Category', 'Seat Quota', 'Course Fee', 'Year', 'R1', 'R2', 'R3', 'R4', 'R5']
     const rows = apiColleges.map(c => [
       `"${c.name}"`, `"${c.state}"`, `"${c.type}"`,
-      `"${c.category}"`, `"${c.round}"`, `"${c.year}"`, `"${c.maxRank || 'N/A'}"`
+      `"${c.category}"`, `"${c.quota || '-'}"`, `"${c.course_fee || 'N/A'}"`, `"${c.year}"`, 
+      `"${c.rounds?.r1 || '-'}"`, `"${c.rounds?.r2 || '-'}"`, `"${c.rounds?.r3 || '-'}"`, 
+      `"${c.rounds?.r4 || '-'}"`, `"${c.rounds?.r5 || '-'}"`
     ])
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
@@ -96,9 +151,34 @@ export default function CollegePredictor() {
     document.body.removeChild(link)
   }
 
-  const rankLocked = !!user?.bestRank
-  const categoryFromProfile = !!user?.category
-  const courseLocked = !!user?.ugOrPg
+  const handleSort = (key) => {
+    let direction = 'asc'
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc'
+    setSortConfig({ key, direction })
+  }
+
+  const sortedColleges = [...apiColleges].sort((a, b) => {
+    if (!sortConfig.key) return 0
+    const valA = a[sortConfig.key]
+    const valB = b[sortConfig.key]
+
+    if (valA === undefined || valA === null) return 1
+    if (valB === undefined || valB === null) return -1
+
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return sortConfig.direction === 'asc' ? valA - valB : valB - valA
+    }
+
+    const strA = valA.toString().toLowerCase()
+    const strB = valB.toString().toLowerCase()
+    if (strA < strB) return sortConfig.direction === 'asc' ? -1 : 1
+    if (strA > strB) return sortConfig.direction === 'asc' ? 1 : -1
+    return 0
+  })
+
+  const rankLocked = !!user?.bestRank && user?.role !== 'ADMIN'
+  const categoryFromProfile = !!user?.category && user?.role !== 'ADMIN'
+  const courseLocked = !!user?.ugOrPg && user?.role !== 'ADMIN'
 
   return (
     <div className="page-container">
@@ -149,14 +229,31 @@ export default function CollegePredictor() {
             </div>
           </div>
 
-          {/* Category — from profile */}
+          {/* Category */}
           <div className="field-group" style={{ flex: '1 1 140px' }}>
             <label className="field-label">
               <span className="material-icons" style={{ fontSize: '0.9rem' }}>people</span>
-              {' '}Category {categoryFromProfile && <span style={{ color: '#4ade80', fontSize: '0.7rem' }}>● Profile</span>}
+              {' '}Category {categoriesLoading && <span style={{ fontSize: '0.7rem' }}>⏳</span>}
             </label>
-            <select className="field-select" value={category} onChange={e => !categoryFromProfile && setCategory(e.target.value)} disabled={categoryFromProfile} style={{ opacity: categoryFromProfile ? 0.8 : 1, cursor: categoryFromProfile ? 'not-allowed' : 'pointer' }}>
-              {['G', 'EWS', 'SC', 'ST', 'OBC', 'OBC-NCL'].map(c => <option key={c}>{c}</option>)}
+            <select className="field-select" value={category} onChange={e => setCategory(e.target.value)} disabled={categoriesLoading} style={{ opacity: categoriesLoading ? 0.8 : 1, cursor: categoriesLoading ? 'wait' : 'pointer' }}>
+              <option value="All">All Categories</option>
+              {dynamicCategories.length > 0 ? (
+                dynamicCategories.map(c => <option key={c} value={c}>{c}</option>)
+              ) : (
+                ['G', 'EWS', 'SC', 'ST', 'OBC', 'OBC-NCL'].map(c => <option key={c}>{c}</option>)
+              )}
+            </select>
+          </div>
+
+          {/* Quota */}
+          <div className="field-group" style={{ flex: '1 1 140px' }}>
+            <label className="field-label">
+              <span className="material-icons" style={{ fontSize: '0.9rem' }}>event_seat</span>
+              {' '}Seat Type / Quota {quotasLoading && <span style={{ fontSize: '0.7rem' }}>⏳</span>}
+            </label>
+            <select className="field-select" value={quota} onChange={e => setQuota(e.target.value)} disabled={quotasLoading} style={{ opacity: quotasLoading ? 0.8 : 1, cursor: quotasLoading ? 'wait' : 'pointer' }}>
+              <option value="All">All Quotas</option>
+              {dynamicQuotas.map(q => <option key={q} value={q}>{q}</option>)}
             </select>
           </div>
 
@@ -195,7 +292,9 @@ export default function CollegePredictor() {
               {' '}State
             </label>
             <select className="field-select" value={stateFilter} onChange={e => setStateFilter(e.target.value)} disabled={counsellingType !== 'State'}>
-              {STATES.map(s => <option key={s}>{s}</option>)}
+              {STATES_LIST.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
             </select>
           </div>
 
@@ -299,34 +398,62 @@ export default function CollegePredictor() {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>College Name</th>
-                  <th>State</th>
-                  <th>Type</th>
-                  <th>Category</th>
-                  <th>Round</th>
-                  <th>Year</th>
-                  <th>Cutoff Rank</th>
+                  <th onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                    College Name {sortConfig.key === 'name' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th onClick={() => handleSort('state')} style={{ cursor: 'pointer' }}>
+                    State {sortConfig.key === 'state' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th onClick={() => handleSort('type')} style={{ cursor: 'pointer' }}>
+                    Type {sortConfig.key === 'type' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th onClick={() => handleSort('category')} style={{ cursor: 'pointer' }}>
+                    Category {sortConfig.key === 'category' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th onClick={() => handleSort('quota')} style={{ cursor: 'pointer' }}>
+                    Quota {sortConfig.key === 'quota' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th onClick={() => handleSort('course_fee')} style={{ cursor: 'pointer' }}>
+                    Fee {sortConfig.key === 'course_fee' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th>R1</th>
+                  <th>R2</th>
+                  <th>R3</th>
+                  <th>R4</th>
+                  <th>R5</th>
                 </tr>
               </thead>
               <tbody>
-                {apiColleges.map((c, i) => (
-                  <tr key={c.name + i} style={{ background: c.maxRank && c.maxRank >= Number(rank) ? 'rgba(74,222,128,0.04)' : undefined }}>
-                    <td style={{ color: 'var(--on-surface-variant)', fontSize: '0.8rem' }}>{i + 1}</td>
-                    <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.name}</td>
-                    <td>{c.state}</td>
-                    <td>
-                      <span style={{ padding: '0.2rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', background: c.type === 'Government' ? '#4ade8022' : c.type === 'AIIMS' ? '#d32f2f22' : '#60a5fa22', color: c.type === 'Government' ? '#4ade80' : c.type === 'AIIMS' ? '#d32f2f' : '#60a5fa' }}>
-                        {c.type}
-                      </span>
-                    </td>
-                    <td>{c.category}</td>
-                    <td>{c.round}</td>
-                    <td>{c.year}</td>
-                    <td style={{ fontWeight: 700, color: c.maxRank && c.maxRank >= Number(rank) ? '#4ade80' : 'var(--on-surface)' }}>
-                      {c.maxRank ? c.maxRank.toLocaleString() : 'N/A'}
-                    </td>
-                  </tr>
-                ))}
+                {sortedColleges.map((c, i) => {
+                  const parseRank = str => {
+                    if (!str) return null;
+                    const v = parseInt(str.replace(/\D.*$/, ''), 10);
+                    return isNaN(v) ? null : v;
+                  };
+                  const rankInt = Number(rank);
+                  const isEligible = r => r && parseRank(r) >= rankInt;
+                  
+                  return (
+                    <tr key={c.name + i} style={{ background: c.maxRank && c.maxRank >= rankInt ? 'rgba(74,222,128,0.04)' : undefined }}>
+                      <td style={{ color: 'var(--on-surface-variant)', fontSize: '0.8rem' }}>{i + 1}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--primary)' }}>{c.name}</td>
+                      <td>{STATES_LIST.find(s => s.value === c.state)?.label || c.state}</td>
+                      <td>
+                        <span style={{ padding: '0.2rem 0.6rem', borderRadius: '1rem', fontSize: '0.75rem', background: c.type?.toLowerCase() === 'ug' ? '#4ade8022' : '#60a5fa22', color: c.type?.toLowerCase() === 'ug' ? '#4ade80' : '#60a5fa', textTransform: 'uppercase' }}>
+                          {c.type}
+                        </span>
+                      </td>
+                      <td>{c.category}</td>
+                      <td>{c.quota || '-'}</td>
+                      <td style={{ fontWeight: 600, color: 'var(--on-surface)' }}>{c.course_fee ? `₹${Number(c.course_fee).toLocaleString()}` : '-'}</td>
+                      <td style={{ color: isEligible(c.rounds?.r1) ? '#4ade80' : 'inherit' }}>{c.rounds?.r1 || '-'}</td>
+                      <td style={{ color: isEligible(c.rounds?.r2) ? '#4ade80' : 'inherit' }}>{c.rounds?.r2 || '-'}</td>
+                      <td style={{ color: isEligible(c.rounds?.r3) ? '#4ade80' : 'inherit' }}>{c.rounds?.r3 || '-'}</td>
+                      <td style={{ color: isEligible(c.rounds?.r4) ? '#4ade80' : 'inherit' }}>{c.rounds?.r4 || '-'}</td>
+                      <td style={{ color: isEligible(c.rounds?.r5) ? '#4ade80' : 'inherit' }}>{c.rounds?.r5 || '-'}</td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

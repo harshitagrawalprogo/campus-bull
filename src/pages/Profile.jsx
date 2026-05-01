@@ -4,14 +4,11 @@ import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../utils/api'
 import './Profile.css'
 
+import { STATES_LIST } from '../constants/states'
+
+
 const BRANCHES = ['NEET MBBS', 'NEET BDS', 'NEET AYUSH', 'Engineering', 'Other']
 const CATEGORIES = ['General', 'OBC', 'SC', 'ST', 'EWS']
-const STATES = [
-  'Andhra Pradesh','Arunachal Pradesh','Assam','Bihar','Chhattisgarh','Delhi','Goa',
-  'Gujarat','Haryana','Himachal Pradesh','Jharkhand','Karnataka','Kerala','Madhya Pradesh',
-  'Maharashtra','Manipur','Meghalaya','Mizoram','Nagaland','Odisha','Punjab','Rajasthan',
-  'Sikkim','Tamil Nadu','Telangana','Tripura','Uttar Pradesh','Uttarakhand','West Bengal'
-]
 const TARGET_YEARS = ['2025','2026','2027','2028']
 
 export default function Profile() {
@@ -26,6 +23,25 @@ export default function Profile() {
   const [error, setError] = useState(location.state?.message || '')
   const [attempts, setAttempts] = useState([])
   const [loadingHistory, setLoadingHistory] = useState(true)
+  const [dynamicCategories, setDynamicCategories] = useState(CATEGORIES)
+
+  useEffect(() => {
+    if (!form.domicile || !form.ugOrPg) {
+      setDynamicCategories(CATEGORIES)
+      return
+    }
+    const stateVal = STATES_LIST.find(s => s.label === form.domicile)?.value
+    if (!stateVal) return
+    apiFetch(`/predict/categories?state=${stateVal}&course=${form.ugOrPg}`)
+      .then(data => {
+        if (data.categories?.length > 0) {
+          setDynamicCategories(data.categories)
+        } else {
+          setDynamicCategories(CATEGORIES)
+        }
+      })
+      .catch(() => setDynamicCategories(CATEGORIES))
+  }, [form.domicile, form.ugOrPg])
 
   useEffect(() => {
     if (user) {
@@ -208,14 +224,14 @@ export default function Profile() {
                   <label className="field-label">Category</label>
                   <select className="field-select" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
                     <option value="">Select category</option>
-                    {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                    {dynamicCategories.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
                 <div className="field-group">
                   <label className="field-label">Domicile State</label>
                   <select className="field-select" value={form.domicile} onChange={e => setForm({ ...form, domicile: e.target.value })}>
                     <option value="">Select state</option>
-                    {STATES.map(s => <option key={s}>{s}</option>)}
+                    {STATES_LIST.filter(s => s.value !== 'All' && s.value !== 'all_indias' && s.value !== 'afms' && s.value !== 'dnbs' && s.value !== 'neigrihms' && s.value !== 'open_states').map(s => <option key={s.label}>{s.label}</option>)}
                   </select>
                 </div>
                 <div className="field-group">

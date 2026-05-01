@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { apiFetch } from '../utils/api'
+import AnnouncementBanner from '../components/AnnouncementBanner'
 import './Dashboard.css'
 
 // Removed static QA_LIST
@@ -167,6 +168,9 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Announcement Banner */}
+      <AnnouncementBanner />
 
       {/* Welcome header */}
       <div className="dash-header animate-in">
@@ -355,7 +359,6 @@ export default function Dashboard() {
                 { to: '/rank-predictor',    icon: 'insights',         label: 'Rank Predictor', color: '#d32f2f' },
                 { to: '/mock-tests',        icon: 'quiz',             label: 'Mock Tests',     color: '#f8bd2a' },
                 { to: '/college-predictor', icon: 'account_balance',  label: 'College Finder', color: '#4ade80' },
-                { to: '/counselling-guide', icon: 'menu_book',        label: 'Counselling',    color: '#60a5fa' },
                 { to: '/profile',           icon: 'manage_accounts',  label: 'My Profile',     color: '#a78bfa' },
               ].map(q => (
                 <Link key={q.to} to={q.to} className="quick-item">

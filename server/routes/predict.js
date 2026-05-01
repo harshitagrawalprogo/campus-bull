@@ -93,21 +93,87 @@ router.post('/rank', async (req, res) => {
   }
 })
 
+// Helper to get table name from closing_ranks safely
+async function getTableName(state, counsellingType) {
+  if (counsellingType === 'MCC' || state === 'All India' || state === 'open_states') {
+    return 'open_states'
+  }
+  if (!state || state === 'All') {
+    return 'open_states'
+  }
+  
+  // Direct match to closing_ranks table
+  const records = await prisma.$queryRawUnsafe(`SELECT table_name FROM closing_ranks WHERE state_name = $1 OR table_name = $1 LIMIT 1`, state)
+  if (records && records.length > 0 && records[0].table_name) {
+    return records[0].table_name
+  }
+  
+  // Fallback map for common ones
+  const map = {
+    'karnatakas': 'karnatakas', 'andhra_pradeshes': 'andhra_pradeshes', 'delhis': 'delhis',
+    'maharashtras': 'maharashtras', 'uttar_pradeshes': 'uttar_pradeshes', 'telanganas': 'telanganas',
+    'tamil_nadus': 'tamil_nadus', 'west_bengals': 'west_bengals', 'gujarats': 'gujarats'
+  }
+  return map[state] || 'open_states'
+}
+
+// GET /api/predict/categories — get distinct categories for a state
+router.get('/categories', async (req, res) => {
+  try {
+    const { state, counsellingType } = req.query;
+    const tableName = await getTableName(state, counsellingType)
+    
+    // Sanitize table name to prevent SQL injection
+    if (!/^[a-zA-Z_]+$/.test(tableName)) return res.json([])
+
+    const rows = await prisma.$queryRawUnsafe(`
+      SELECT DISTINCT "category" AS cat 
+      FROM "${tableName}" 
+      WHERE "category" IS NOT NULL 
+      ORDER BY "category" ASC
+    `)
+    res.json(rows.map(r => r.cat))
+  } catch (err) {
+    console.error('Failed to fetch categories:', err)
+    res.status(500).json({ error: 'Failed to fetch categories' });
+  }
+})
+
+// GET /api/predict/quotas — get distinct quotas for a state
+router.get('/quotas', async (req, res) => {
+  try {
+    const { state, counsellingType } = req.query;
+    const tableName = await getTableName(state, counsellingType)
+    
+    if (!/^[a-zA-Z_]+$/.test(tableName)) return res.json([])
+
+    const rows = await prisma.$queryRawUnsafe(`
+      SELECT DISTINCT "quota" AS qt 
+      FROM "${tableName}" 
+      WHERE "quota" IS NOT NULL 
+      ORDER BY "quota" ASC
+    `)
+    res.json(rows.map(r => r.qt))
+  } catch (err) {
+    console.error('Failed to fetch quotas:', err)
+    res.status(500).json({ error: 'Failed to fetch quotas' });
+  }
+})
+
 // GET /api/predict/colleges — get list of college names
 router.get('/colleges', async (req, res) => {
   try {
     const { state, counsellingType } = req.query;
-    let whereClause = {};
-    if (counsellingType === 'State' && state && state !== 'All') {
-      whereClause.state = { equals: state, mode: 'insensitive' };
-    }
-    const colleges = await prisma.college.findMany({
-      where: whereClause,
-      select: { name: true },
-      orderBy: { name: 'asc' },
-      distinct: ['name']
-    });
-    res.json(colleges.map(c => c.name));
+    const tableName = await getTableName(state, counsellingType)
+    if (!/^[a-zA-Z_]+$/.test(tableName)) return res.json([])
+
+    const rows = await prisma.$queryRawUnsafe(`
+      SELECT DISTINCT college AS name 
+      FROM "${tableName}" 
+      WHERE college IS NOT NULL 
+      ORDER BY college ASC
+    `)
+    res.json(rows.map(c => c.name));
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch colleges' });
@@ -117,56 +183,105 @@ router.get('/colleges', async (req, res) => {
 // POST /api/predict/college — detailed college search
 router.post('/college', async (req, res) => {
   try {
-    const { rank, state, type, counsellingType, category, collegeName, budget, limit } = req.body
+    const { rank, state, courseType, counsellingType, category, quota, collegeName, budget, limit } = req.body
 
     if (!rank || rank < 0) {
       return res.status(400).json({ error: 'Valid rank is required' })
     }
 
-    // Build college-level filter
-    const collegeFilter = {}
-    if (state && state !== 'All') {
-      collegeFilter.state = { equals: state, mode: 'insensitive' }
-    }
-    if (type && type !== 'All') {
-      collegeFilter.type = { equals: type, mode: 'insensitive' }
-    }
-    if (collegeName && collegeName.trim()) {
-      collegeFilter.name = { contains: collegeName.trim(), mode: 'insensitive' }
-    }
-
-    // Build allotment-level filter
-    const whereClause = {
-      aiRank: { gte: parseInt(rank) }
-    }
-    if (category && category !== 'All') {
-      whereClause.category = { contains: category, mode: 'insensitive' }
-    }
-    if (Object.keys(collegeFilter).length > 0) {
-      whereClause.college = collegeFilter
-    }
+    const tableName = await getTableName(state, counsellingType)
+    if (!/^[a-zA-Z_]+$/.test(tableName)) return res.status(400).json({ error: 'Invalid state' })
 
     const dbLimit = parseInt(limit) || 20
+    const catCol = 'category'
+    const rankInt = parseInt(rank)
 
-    const dbAllotments = await prisma.collegeAllotment.findMany({
-      where: whereClause,
-      include: { college: true },
-      orderBy: { aiRank: 'asc' },
-      take: dbLimit
+    // Build the WHERE clause dynamically
+    let whereClauses = []
+    let params = []
+    let pIdx = 1
+
+    // Category filter
+    if (category && category !== 'All') {
+      whereClauses.push(`"${catCol}" ILIKE $${pIdx++}`)
+      params.push(`%${category}%`)
+    }
+
+    // Quota filter
+    if (quota && quota !== 'All') {
+      whereClauses.push(`"quota" ILIKE $${pIdx++}`)
+      params.push(`%${quota}%`)
+    }
+
+    // Type filter (UG/PG)
+    if (courseType && courseType !== 'All') {
+      whereClauses.push(`type ILIKE $${pIdx++}`)
+      params.push(`%${courseType}%`)
+    }
+
+    // College Name filter
+    if (collegeName && collegeName.trim() && collegeName !== 'All') {
+      whereClauses.push(`college ILIKE $${pIdx++}`)
+      params.push(`%${collegeName.trim()}%`)
+    }
+
+    // Budget filter
+    if (budget && Number(budget) > 0) {
+      whereClauses.push(`CAST(NULLIF(regexp_replace(course_fee::text, '\\D', '', 'g'), '') AS INTEGER) <= $${pIdx++}`)
+      params.push(Number(budget))
+    }
+
+    // Rank logic: Check if ANY round cutoff is >= the user's rank
+    // For r1 to r10, extract digits and cast to integer.
+    const rankChecks = []
+    for (let i = 1; i <= 10; i++) {
+      rankChecks.push(`CAST(NULLIF(regexp_replace(r${i}, '\\D.*', ''), '') AS INTEGER) >= $${pIdx}`)
+    }
+    whereClauses.push(`(${rankChecks.join(' OR ')})`)
+    params.push(rankInt)
+
+    const whereStr = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : ''
+
+    const query = `
+      SELECT id, college, state, type, course_fee, quota, "${catCol}" as category, year, round, r1, r2, r3, r4, r5, r6, r7, r8, r9, r10
+      FROM "${tableName}"
+      ${whereStr}
+      ORDER BY college ASC
+      LIMIT ${dbLimit}
+    `
+    const dbAllotments = await prisma.$queryRawUnsafe(query, ...params)
+
+    const colleges = dbAllotments.map(a => {
+      // Find the best valid rank from rounds
+      let maxR = 0
+      for (let i = 1; i <= 10; i++) {
+        if (a[`r${i}`]) {
+          const val = parseInt(a[`r${i}`].replace(/\D.*$/, ''), 10)
+          if (!isNaN(val) && val >= rankInt && val > maxR) {
+            maxR = val
+          }
+        }
+      }
+      return {
+        name: a.college,
+        state: a.state || state || 'All India',
+        type: a.type || 'ug',
+        category: a.category,
+        quota: a.quota,
+        year: a.year || '2023',
+        course_fee: a.course_fee,
+        maxRank: maxR || null,
+        rounds: {
+          r1: a.r1, r2: a.r2, r3: a.r3, r4: a.r4, 
+          r5: a.r5, r6: a.r6, r7: a.r7, r8: a.r8, r9: a.r9, r10: a.r10
+        }
+      }
     })
 
-    const colleges = dbAllotments.map(a => ({
-      name: a.college.name,
-      state: a.college.state || 'All India',
-      type: a.college.type || 'Government',
-      minRank: Math.max(1, a.aiRank - 1500),
-      maxRank: a.aiRank,
-      category: a.category || category || 'General',
-      year: a.year || '2023',
-      round: a.round || '1'
-    }))
-
-    const total = await prisma.collegeAllotment.count({ where: whereClause })
+    // Count total matches
+    const countQuery = `SELECT COUNT(*) as cnt FROM "${tableName}" ${whereStr}`
+    const countRes = await prisma.$queryRawUnsafe(countQuery, ...params)
+    const total = countRes[0]?.cnt ? parseInt(countRes[0].cnt.toString()) : 0
 
     res.json({ rank, colleges, total })
   } catch (err) {

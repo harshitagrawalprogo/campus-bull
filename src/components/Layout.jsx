@@ -89,9 +89,9 @@ export default function Layout() {
           {user?.role === 'ADMIN' && (
             <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
               <div style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--on-surface-variant)', marginBottom: '0.5rem', paddingLeft: '1rem' }}>Admin Tools</div>
-              <NavLink to="/dashboard/admin" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+              <NavLink to="/admin" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
                 <span className="material-icons">admin_panel_settings</span>
-                <span>User Management</span>
+                <span>Admin Console</span>
               </NavLink>
             </div>
           )}
