@@ -203,8 +203,15 @@ router.post('/college', async (req, res) => {
 
     // Category filter
     if (category && category !== 'All') {
-      whereClauses.push(`"${catCol}" ILIKE $${pIdx++}`)
-      params.push(`%${category}%`)
+      const cats = category.split(',').map(c => c.trim())
+      if (cats.length > 1) {
+        const placeholders = cats.map(() => `$${pIdx++}`).join(', ')
+        whereClauses.push(`"${catCol}" IN (${placeholders})`)
+        params.push(...cats)
+      } else {
+        whereClauses.push(`"${catCol}" ILIKE $${pIdx++}`)
+        params.push(`%${category}%`)
+      }
     }
 
     // Quota filter

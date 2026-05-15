@@ -6,6 +6,136 @@ import './CollegePredictor.css'
 import { STATES_LIST } from '../constants/states'
 const TYPES  = ['All', 'Government', 'Private', 'AIIMS', 'Deemed']
 
+const QUOTA_MAPPING = {
+  "Central": [
+    "ACMS-ArmyWard", "AFMS", "AFMS0DNB", "AIQ", "CMC 5-% Seats", "DNB Post MBBS", "MM", "MNG", "MQ1", "NBE Diploma", "NRI", "Other State"
+  ],
+  "delhis": [
+    "ACMS-DelhiQuota", "ACMS-OutsideDelhi", "DU", "IP", "IP-DelhiQuota"
+  ],
+  "andhra_pradeshes": [
+    "AP Govt Quota - AP Local", "AP Govt-AP UNR", "AP Govt-LOC(AU)", "AP Govt-LOC(OU)", "AP Govt-LOC(SVU)", "AP Govt-NS AP LOC", "AP Govt-NS APUR", "AP Govt-NS LOC (AU)", "AP Govt-NS LOC (OU)", "AP Govt-NS LOC (SVU)", "AP Govt-NS UNR", "AP Govt-Serv APUR", "AP Govt-Serv LOC (AU)", "AP Govt-Serv LOC (SVU)", "AP Govt-Serv UNR", "AP Govt-UNR", "APMgmt-CA NRI", "APMgmt-CA SF", "APMgmt-CatB1", "APMgmt-CatB1- MIN", "APMgmt-CatB2", "APMgmt-CatC(NRI)", "APMgmt-CatC(NRI)-MIN", "APMgmt-S1-All-CatB", "APMgmt-S1B-LOC-CatB", "APMgmt-S2-CatC-NRI", "APMgmt-S3-CatC-Inst"
+  ],
+  "bihars": [
+    "Bihar Priv-Open", "Bihar-Priv-GEN"
+  ],
+  "chhattisgarhs": [
+    "CHTSGRH-Pvt-MgmtQuota"
+  ],
+  "gujarats": [
+    "GUJ Govt-AllGujStud.", "GUJ Govt-Inservice", "GUJ Govt-Inst. Pref", "GUJ Mgmt Quota", "GUJ Mgmt-NRI", "Gujarat Govt Seats", "Gujarat Local Seats", "Gujarat Mgmt Seats", "Gujarat NRI Seats"
+  ],
+  "haryanas": [
+    "HAR Priv-MGMT", "HAR Priv-Mgmt"
+  ],
+  "himachal_pradeshes": [
+    "HP Mgmt - All", "HP Priv All"
+  ],
+  "jharkhands": [
+    "JHKND-Pvt-MNGAllIndia"
+  ],
+  "karnatakas": [
+    "KAR DNB Serv", "KAR Govt Quota", "KAR Govt Quota-InS", "KAR Govt Quota-Open", "KAR NRI Quota", "KAR Others (Inst.Q)", "KAR Others (Q)", "KAR Priv Seats-GMP", "KAR Priv Seats-Min", "KAR Priv Seats-Min.", "KAR Priv Seats-Open"
+  ],
+  "kerlas": [
+    "KER SF-All India"
+  ],
+  "maharashtras": [
+    "MAHA Priv-Mgmt Quota", "MAHA Priv-Min Quota", "MAHA-Govt Quota", "MAHA-Govt-All", "MAHA-Govt-AllW", "MAHA-Govt-Defense", "MAHA-Govt-DefenseW", "MAHA-Govt-HillyArea", "MAHA-Govt-HillyAreaW", "MAHA-Govt-MKB", "MAHA-Govt-MKBW", "MAHA-NRI Quota"
+  ],
+  "madhya_pradeshes": [
+    "MP Govt-NonDomicile", "MP Priv-NonDomicile"
+  ],
+  "punjabs": [
+    "PB - Govt Quota", "PB Priv-AdeshAllIndia", "PB Priv-AdeshGenMerit", "PB Priv-DMC Mgmt", "PB Priv-SGRDGener."
+  ],
+  "pondicherries": [
+    "PY Mgmt-Open"
+  ],
+  "rajasthans": [
+    "RAJ Priv-All India", "RAJ Priv-Mgmt Quota"
+  ],
+  "sikkims": [
+    "Sikkim Gen Quota", "Sikkim Mgmt Quota"
+  ],
+  "telanganas": [
+    "TELMgmt-MQ1-CatB-All", "TELMgmt-MQ2-CatC-NRI", "TELMgmt-MQ3-CatC-Inst", "Tel Govt-LOC (AU)", "Tel Govt-LOC (OU)", "Tel Govt-LOC (SVU)", "Tel Govt-NS LOC", "Tel Govt-NS UNR", "Tel Govt-Serv LOC", "Tel Govt-Serv UNR", "Tel Govt-UNR", "Tel Mgmt-Cat B-LOC", "Tel Mgmt-Cat B-UNR", "Tel Mgmt-Cat C(NRI)"
+  ],
+  "tamil_nadus": [
+    "TN CMC-General Merit", "TN CMC-Inst Preference", "TN CMC-Minority Network", "TN CMC-Service", "TN Govt 7.5%", "TN Govt 92.5%", "TN Govt Quota", "TN Mgmt Quota", "TN Mgmt Quota-MIN", "TN Mgmt Quota-NRI", "TN Mgmt Quota-NRILAPSE", "TN Mgmt-Christian Min", "TN Mgmt-Malayalam Min", "TN Mgmt-Telugu Min", "TN NRI Quota", "TN-CMC Minority 2-"
+  ],
+  "tripuras": [
+    "Tripura Pvt All India"
+  ],
+  "uttarakhands": [
+    "UK Priv-AllIndia/Mgmt", "UK-Pvt-AllIndiaQuota"
+  ],
+  "uttar_pradeshes": [
+    "UP Priv-Min. Quota", "UP Priv-Open Quota", "UP-DNB InS", "UP-Govt Quota"
+  ],
+  "west_bengals": [
+    "WB DNB Serv", "WB Govt Quota", "WB Mgmt Quota", "WB NRI Quota"
+  ]
+};
+
+const CATEGORY_MAPPING = {
+  "Central": {
+    "GEN": ["GEN", "OPEN", "UR"],
+    "OBC": ["OBC"],
+    "SC": ["SC"],
+    "ST": ["ST"],
+    "EWS": ["EWS"],
+    "PwD": ["GEN0PwD", "OBC0PwD", "SC0PwD", "ST0PwD", "EWS0PwD"],
+    "AFMS": ["AFMS0Priority III", "AFMS0Priority IV"]
+  },
+  "karnatakas": {
+    "GEN": ["GM", "GMH", "GMK", "GMKH", "GMR", "GMRH", "OPEN", "OPEN-GEN", "OPEN-FEM", "OPN"],
+    "OBC": ["1G", "1H", "1K", "1KH", "1R", "1RH", "2AG", "2AH", "2AK", "2AKH", "2AR", "2ARH", "2BG", "2BH", "2BK", "2BKH", "2BR", "2BRH", "3AG", "3AH", "3AK", "3AKH", "3AR", "3ARH", "3BG", "3BH", "3BK", "3BKH", "3BR", "3BRH"],
+    "SC": ["SCG", "SCH", "SCK", "SCKH", "SCR", "SCRH"],
+    "ST": ["STG", "STH", "STK", "STKH", "STR", "STRH"],
+    "MANAGEMENT/NRI": ["GMP", "GMPH", "NRI"]
+  },
+  "andhra_pradeshes": {
+    "GEN": ["OC", "OC Open", "OC Serv", "OPEN", "OPEN-GEN", "OPEN-FEM", "OP", "Open"],
+    "OBC/BC": ["BC", "BC Open", "BC Serv", "BC Service", "BCA-GEN", "BCB-GEN", "BCC-GEN", "BCD-GEN", "BCE-GEN", "BCM"],
+    "SC": ["SC", "SC Open", "SC Serv", "SC Service", "SC-OP", "SC-PH"],
+    "ST": ["ST", "ST Open", "ST Serv", "ST Service", "ST-OP", "ST-PH"],
+    "EWS": ["EWS", "EWS Open", "EWS Service", "EWS-PH"],
+    "MINORITY": ["Christian Minority", "Malayalam Minority", "Telugu Minority", "BCM"],
+    "MANAGEMENT/NRI": ["CAT B1", "CAT B2", "CAT C(NRI)", "CA NRI", "MNG", "MQ", "MQ1", "MQ2", "MQ3", "NQ-NRI", "NRI"]
+  },
+  "telanganas": {
+    "GEN": ["OC", "OC Open", "OC Serv", "OPEN", "OPEN-GEN", "OPEN-FEM", "OP", "Open"],
+    "OBC/BC": ["BC", "BC Open", "BC Serv", "BC Service", "BCA-GEN", "BCB-GEN", "BCC-GEN", "BCD-GEN", "BCE-GEN", "BCM"],
+    "SC": ["SC", "SC Open", "SC Serv", "SC Service", "SC-OP", "SC-PH"],
+    "ST": ["ST", "ST Open", "ST Serv", "ST Service", "ST-OP", "ST-PH"],
+    "EWS": ["EWS", "EWS Open", "EWS Service", "EWS-PH"],
+    "MINORITY": ["Christian Minority", "Malayalam Minority", "Telugu Minority", "BCM"],
+    "MANAGEMENT/NRI": ["CAT B1", "CAT B2", "CAT C(NRI)", "CA NRI", "MNG", "MQ", "MQ1", "MQ2", "MQ3", "NQ-NRI", "NRI"]
+  },
+  "tamil_nadus": {
+    "GEN": ["OC", "BC", "BCM", "MBC", "OPEN"],
+    "SC": ["SC", "SCA"],
+    "ST": ["ST"],
+    "MINORITY": ["Christian Minority", "Malayalam Minority", "Telugu Minority", "Minority"],
+    "MANAGEMENT/NRI": ["Management", "MGT", "NRI", "NRI Lapsed"]
+  },
+  "maharashtras": {
+    "GEN": ["OPEN", "UR", "UR Open"],
+    "OBC/SEBC": ["OBC", "SEBC", "NT1", "NT2", "NT3", "VJ", "VJA"],
+    "SC": ["SC"],
+    "ST": ["ST"],
+    "EWS": ["EWS"],
+    "SPECIAL": ["DEF1", "DEF2", "DEF3", "PH", "CAP"]
+  },
+  "gujarats": {
+    "GEN": ["OPEN", "OP", "GQ-OP", "IQ-OP", "UQ-OP"],
+    "SC": ["GQ-SC", "IQ-SC", "UQ-SC"],
+    "ST": ["GQ-ST", "IQ-ST", "UQ-ST"],
+    "EWS": ["GQ-EW", "IQ-EW", "UQ-EW"],
+    "SEBC/OBC": ["GQ-SE", "IQ-SE", "UQ-SE", "SE", "SEBC"]
+  }
+};
 
 export default function CollegePredictor() {
   const { user } = useAuth()
@@ -21,7 +151,7 @@ export default function CollegePredictor() {
   const [typeFilter,      setTypeFilter]       = useState('All')
   const [counsellingType, setCounsellingType]  = useState(profileState === 'All' ? 'All' : 'State')
   const [category,        setCategory]         = useState(profileCategory)
-  const [dynamicCategories, setDynamicCategories] = useState([])
+  const [dynamicCategories, setDynamicCategories] = useState({})
   const [categoriesLoading, setCategoriesLoading] = useState(false)
   const [quota,           setQuota]            = useState('All')
   const [dynamicQuotas,   setDynamicQuotas]    = useState([])
@@ -59,49 +189,36 @@ export default function CollegePredictor() {
     fetchColleges()
   }, [stateFilter, counsellingType])
 
-  // Fetch dynamic categories
+  // Compute dynamic categories
   useEffect(() => {
-    async function fetchCategories() {
-      setCategoriesLoading(true)
-      try {
-        const query = new URLSearchParams()
-        if (counsellingType !== 'All' && counsellingType !== 'MCC') query.append('counsellingType', counsellingType)
-        if (stateFilter !== 'All') query.append('state', stateFilter)
-        const res = await apiFetch(`/predict/categories?${query.toString()}`)
-        if (Array.isArray(res)) {
-          setDynamicCategories(res)
-          setCategory('All')
+    const grouped = JSON.parse(JSON.stringify(CATEGORY_MAPPING["Central"]));
+    if (stateFilter !== 'All' && CATEGORY_MAPPING[stateFilter]) {
+      const stateCats = CATEGORY_MAPPING[stateFilter];
+      for (const [group, values] of Object.entries(stateCats)) {
+        if (!grouped[group]) {
+          grouped[group] = [];
         }
-      } catch (err) {
-        console.warn('Failed to fetch categories', err)
-      } finally {
-        setCategoriesLoading(false)
+        const uniqueValues = new Set([...grouped[group], ...values]);
+        grouped[group] = Array.from(uniqueValues);
       }
     }
-    fetchCategories()
-  }, [stateFilter, counsellingType])
+    for (const group in grouped) {
+      grouped[group].sort((a, b) => a.localeCompare(b));
+    }
+    setDynamicCategories(grouped);
+    setCategory('All');
+  }, [stateFilter])
 
-  // Fetch dynamic quotas
+  // Compute dynamic quotas
   useEffect(() => {
-    async function fetchQuotas() {
-      setQuotasLoading(true)
-      try {
-        const query = new URLSearchParams()
-        if (counsellingType !== 'All' && counsellingType !== 'MCC') query.append('counsellingType', counsellingType)
-        if (stateFilter !== 'All') query.append('state', stateFilter)
-        const res = await apiFetch(`/predict/quotas?${query.toString()}`)
-        if (Array.isArray(res)) {
-          setDynamicQuotas(res)
-          setQuota('All')
-        }
-      } catch (err) {
-        console.warn('Failed to fetch quotas', err)
-      } finally {
-        setQuotasLoading(false)
-      }
+    let newQuotas = [...QUOTA_MAPPING["Central"]];
+    if (stateFilter !== 'All' && QUOTA_MAPPING[stateFilter]) {
+      newQuotas = [...newQuotas, ...QUOTA_MAPPING[stateFilter]];
     }
-    fetchQuotas()
-  }, [stateFilter, counsellingType])
+    newQuotas.sort((a, b) => a.localeCompare(b));
+    setDynamicQuotas(newQuotas);
+    setQuota('All');
+  }, [stateFilter])
 
   const handleSearch = async () => {
     if (!rank) { alert('Please enter your NEET rank'); return }
@@ -237,8 +354,12 @@ export default function CollegePredictor() {
             </label>
             <select className="field-select" value={category} onChange={e => setCategory(e.target.value)} disabled={categoriesLoading} style={{ opacity: categoriesLoading ? 0.8 : 1, cursor: categoriesLoading ? 'wait' : 'pointer' }}>
               <option value="All">All Categories</option>
-              {dynamicCategories.length > 0 ? (
-                dynamicCategories.map(c => <option key={c} value={c}>{c}</option>)
+              {Object.keys(dynamicCategories).length > 0 ? (
+                Object.entries(dynamicCategories).map(([group, values]) => (
+                  <optgroup key={group} label={group}>
+                    {values.map(c => <option key={c} value={c}>{c}</option>)}
+                  </optgroup>
+                ))
               ) : (
                 ['G', 'EWS', 'SC', 'ST', 'OBC', 'OBC-NCL'].map(c => <option key={c}>{c}</option>)
               )}
