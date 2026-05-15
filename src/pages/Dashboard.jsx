@@ -186,11 +186,11 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="dash-actions">
-          <Link to="/mock-tests" className="btn-primary">
+          <Link to="/dashboard/mock-tests" className="btn-primary">
             <span className="material-icons">play_arrow</span>
             Start Mock Test
           </Link>
-          <Link to="/rank-predictor" className="btn-secondary">
+          <Link to="/dashboard/rank-predictor" className="btn-secondary">
             <span className="material-icons">insights</span>
             Predict Rank
           </Link>
@@ -345,7 +345,7 @@ export default function Dashboard() {
             <span className="material-icons cta-icon-mat">calendar_today</span>
             <h3 className="cta-title">Expert Consultation</h3>
             <p className="cta-desc">Book a 1:1 session with a senior counselor today.</p>
-            <Link to="/expert-counselling" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+            <Link to="/dashboard/expert-counselling" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
               <span className="material-icons">event</span>
               Book Session
             </Link>
@@ -356,10 +356,10 @@ export default function Dashboard() {
             <p className="section-label" style={{ marginBottom: '0.75rem' }}>Quick Access</p>
             <div className="quick-grid">
               {[
-                { to: '/rank-predictor',    icon: 'insights',         label: 'Rank Predictor', color: '#d32f2f' },
-                { to: '/mock-tests',        icon: 'quiz',             label: 'Mock Tests',     color: '#f8bd2a' },
-                { to: '/college-predictor', icon: 'account_balance',  label: 'College Finder', color: '#4ade80' },
-                { to: '/profile',           icon: 'manage_accounts',  label: 'My Profile',     color: '#a78bfa' },
+                { to: '/dashboard/rank-predictor',    icon: 'insights',         label: 'Rank Predictor', color: '#d32f2f' },
+                { to: '/dashboard/mock-tests',        icon: 'quiz',             label: 'Mock Tests',     color: '#f8bd2a' },
+                { to: '/dashboard/college-predictor', icon: 'account_balance',  label: 'College Finder', color: '#4ade80' },
+                { to: '/dashboard/profile',           icon: 'manage_accounts',  label: 'My Profile',     color: '#a78bfa' },
               ].map(q => (
                 <Link key={q.to} to={q.to} className="quick-item">
                   <span className="material-icons" style={{ color: q.color, fontSize: '1.5rem' }}>{q.icon}</span>

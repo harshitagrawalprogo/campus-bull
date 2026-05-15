@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../../utils/api';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -10,14 +11,8 @@ export default function AdminUsers() {
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data);
-      }
+      const data = await apiFetch('/admin/users');
+      setUsers(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -27,16 +22,11 @@ export default function AdminUsers() {
 
   const togglePro = async (id, currentProStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      await apiFetch(`/admin/users/${id}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify({ isPro: !currentProStatus })
       });
-      if (res.ok) fetchUsers();
+      fetchUsers();
     } catch (err) {
       console.error(err);
     }
@@ -45,12 +35,10 @@ export default function AdminUsers() {
   const deleteUser = async (id) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
+      await apiFetch(`/admin/users/${id}`, {
+        method: 'DELETE'
       });
-      if (res.ok) fetchUsers();
+      fetchUsers();
     } catch (err) {
       console.error(err);
     }

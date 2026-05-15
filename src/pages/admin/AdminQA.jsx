@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { apiFetch } from '../../utils/api';
 
 export default function AdminQA() {
   const [questions, setQuestions] = useState([]);
@@ -11,14 +12,8 @@ export default function AdminQA() {
 
   const fetchQuestions = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/qa', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setQuestions(data);
-      }
+      const data = await apiFetch('/qa');
+      setQuestions(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -28,18 +23,11 @@ export default function AdminQA() {
 
   const handleUpdateStatus = async (id, status) => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/qa/question/${id}/status`, {
+      await apiFetch(`/qa/question/${id}/status`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify({ status })
       });
-      if (res.ok) {
-        fetchQuestions();
-      }
+      fetchQuestions();
     } catch (err) {
       console.error(err);
     }
@@ -48,19 +36,12 @@ export default function AdminQA() {
   const handleAnswerSubmit = async () => {
     if (!answerModal.content.trim()) return;
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/qa/question/${answerModal.questionId}/answer`, {
+      await apiFetch(`/qa/question/${answerModal.questionId}/answer`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
         body: JSON.stringify({ content: answerModal.content })
       });
-      if (res.ok) {
-        setAnswerModal({ isOpen: false, questionId: null, content: '' });
-        fetchQuestions();
-      }
+      setAnswerModal({ isOpen: false, questionId: null, content: '' });
+      fetchQuestions();
     } catch (err) {
       console.error(err);
     }

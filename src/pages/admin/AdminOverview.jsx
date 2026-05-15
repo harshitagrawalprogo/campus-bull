@@ -28,12 +28,12 @@ export default function AdminOverview({ onNavigate }) {
   const dateStr = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   const kpis = [
-    { label: 'Total Students',   value: stats.totalUsers,      icon: 'group',       color: 'text-blue-400',   bg: 'from-blue-500/10 to-blue-500/5' },
-    { label: 'Active (24 h)',     value: stats.activeUsers,     icon: 'bolt',        color: 'text-emerald-400', bg: 'from-emerald-500/10 to-emerald-500/5' },
-    { label: 'Tests Taken',       value: stats.totalTestsTaken, icon: 'assignment',  color: 'text-violet-400',  bg: 'from-violet-500/10 to-violet-500/5' },
-    { label: 'Avg Score',         value: `${stats.avgScore}%`,  icon: 'grade',       color: 'text-yellow-400',  bg: 'from-yellow-500/10 to-yellow-500/5' },
+    { label: 'Total Students',   value: stats.totalUsers,      icon: 'group',       color: 'text-blue-400',   bg: 'from-blue-500/10 to-blue-500/5', tabId: 'users' },
+    { label: 'Active (24 h)',     value: stats.activeUsers,     icon: 'bolt',        color: 'text-emerald-400', bg: 'from-emerald-500/10 to-emerald-500/5', tabId: 'users' },
+    { label: 'Tests Taken',       value: stats.totalTestsTaken, icon: 'assignment',  color: 'text-violet-400',  bg: 'from-violet-500/10 to-violet-500/5', tabId: 'users' },
+    { label: 'Avg Score',         value: `${stats.avgScore}%`,  icon: 'grade',       color: 'text-yellow-400',  bg: 'from-yellow-500/10 to-yellow-500/5', tabId: 'users' },
     { label: 'Pending Questions', value: stats.pendingQs,       icon: 'contact_support', color: 'text-red-400', bg: 'from-red-500/10 to-red-500/5',
-      badge: stats.pendingQs > 0 },
+      badge: stats.pendingQs > 0, tabId: 'qa' },
   ];
 
   const modules = [
@@ -111,9 +111,10 @@ export default function AdminOverview({ onNavigate }) {
         {/* KPI Strip */}
         <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {kpis.map((k) => (
-            <div
+            <button
               key={k.label}
-              className={`bg-gradient-to-br ${k.bg} border border-white/5 p-5 rounded-2xl flex flex-col gap-3 relative`}
+              onClick={() => k.tabId && onNavigate(k.tabId)}
+              className={`bg-gradient-to-br ${k.bg} border border-white/5 p-5 rounded-2xl flex flex-col gap-3 relative text-left ${k.tabId ? 'cursor-pointer hover:shadow-xl hover:border-white/10 hover:-translate-y-1 transition-all' : ''}`}
             >
               {k.badge && (
                 <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
@@ -123,7 +124,7 @@ export default function AdminOverview({ onNavigate }) {
                 <p className="text-2xl font-bold text-white">{loading ? '—' : k.value}</p>
                 <p className="text-xs text-zinc-500 uppercase tracking-widest mt-0.5">{k.label}</p>
               </div>
-            </div>
+            </button>
           ))}
         </section>
 
